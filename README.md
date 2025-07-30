@@ -17,12 +17,13 @@ Linear Regression or Random Forest for quick predictions
 
 Features include: Open, High, Low, Close, Volume, and technical indicators (like SMA, EMA, RSI)
 
-🧪 Example Prediction
-For stock: AAPL (Apple Inc.)
+### 🧪 Example Prediction  
+For stock: **AAPL (Apple Inc.)**
 
-Date	Actual Close	Predicted Close
-2025-07-28	195.80	196.42
-2025-07-29	198.20	197.95
+| Date       | Actual Close | Predicted Close |
+|------------|--------------|-----------------|
+| 2025-07-28 | 195.80       | 196.42          |
+| 2025-07-29 | 198.20       | 197.95          |
 
-Accuracy: ~92% on test data
-Loss (MSE): 0.0023
+**Accuracy:** ~92% on test data  
+**Loss (MSE):** 0.0023
