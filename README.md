@@ -1,4 +1,4 @@
-# Stock-Price-Prediction
+# Predictr
 Our project uses historical stock data and machine learning models to predict future stock prices with the aim of helping users make informed investment decisions.
 
 🔮 What it Predicts
