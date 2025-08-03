@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictr - Smart Stock Predictions</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-blue': '#387ef5',
+                        'brand-navy': '#242d3a',
+                        'brand-light': '#f8fafd',
+                        'success': '#00c851',
+                        'warning': '#ff9f43',
+                        'danger': '#ee5a52',
+                        'muted': '#9eb3c2'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .chart-animation {
+            stroke-dasharray: 500;
+            stroke-dashoffset: 500;
+            animation: drawChart 3s ease-out forwards;
+        }
+        
+        @keyframes drawChart {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        
+        .fade-up {
+            opacity: 0;
+            transform: translateY(40px);
+            animation: fadeUp 0.8s ease-out forwards;
+        }
+        
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        
+        .gradient-text {
+            background: linear-gradient(45deg, #387ef5, #00c851);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-10px) rotate(1deg); }
+            66% { transform: translateY(-5px) rotate(-1deg); }
+        }
+        
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="bg-white text-brand-navy antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
+        <div style="width:100%;padding:0;margin:0;">
+            <div class="flex justify-between items-center h-16" style="padding-left:0;margin:0;">
+                <div class="flex items-center space-x-0" style="margin-left:2rem;">
+                    <div class="w-8 h-8 bg-brand-blue rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-semibold text-brand-navy">Predictr</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <div style="position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;max-width:420px;display:flex;justify-content:center;align-items:center;gap:2.5rem;height:100%;">
+                        <a href="#features" class="text-gray-600 hover:text-brand-blue transition-colors px-3 py-1 rounded-md">Features</a>
+                        <!-- <a href="#how-it-works" class="text-gray-600 hover:text-brand-blue transition-colors px-3 py-1 rounded-md">How it works</a> -->
+                        <a href="public-pages/contact.html" class="text-gray-600 hover:text-brand-blue transition-colors px-3 py-1 rounded-md">Contact Us</a>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4" style="margin-right:4rem;margin-left:1rem;">
+                    <button
+                    class="bg-brand-blue text-black px-6 py-2 rounded-lg transition-colors font-medium shadow-lg"
+                    style="background-color:white;"
+                    onmouseover="this.style.backgroundColor='#b2e0d4';"
+                    onmouseout="this.style.backgroundColor='white';"
+                  >
+                    Login
+                  </button>
+                    <button
+                    class="bg-brand-blue text-black px-6 py-2 rounded-lg transition-colors font-medium shadow-lg"
+                    style="background-color:white;"
+                    onmouseover="this.style.backgroundColor='#b2e0d4';"
+                    onmouseout="this.style.backgroundColor='white';"
+                  >
+                    Get started
+                  </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-20 bg-gradient-to-b from-brand-light to-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="fade-up">
+                    <div class="inline-flex items-center bg-blue-50 text-brand-blue px-4 py-2 rounded-full text-sm font-medium mb-6">
+                        <span class="w-2 h-2 bg-success rounded-full mr-2 pulse-dot"></span>
+                        AI-powered predictions
+                    </div>
+                    
+                    <h1 class="text-5xl lg:text-6xl font-bold text-brand-navy leading-tight mb-6">
+                        Invest smarter with 
+                        <span class="gradient-text">AI insights</span>
+                    </h1>
+                    
+                    <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+                        Get accurate stock predictions powered by advanced machine learning. Make confident investment decisions with data-driven insights.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 mb-12">
+                        <button 
+                          class="bg-brand-white text-black px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg"
+                          style="background-color: white;"
+                          onmouseover="this.style.backgroundColor='#b2e0d4';"
+                          onmouseout="this.style.backgroundColor='white';"
+                          onmousedown="this.style.backgroundColor='#b2e0d4';"
+                          onmouseup="this.style.backgroundColor='#b2e0d4';"
+                        >
+                            Start free trial
+                        </button>
+                        <button 
+                          class="bg-brand-white text-black px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg"
+                          style="background-color: white;"
+                          onmouseover="this.style.backgroundColor='#b2e0d4';"
+                          onmouseout="this.style.backgroundColor='white';"
+                          onmousedown="this.style.backgroundColor='#b2e0d4';"
+                          onmouseup="this.style.backgroundColor='#b2e0d4';"
+                        >
+                            Watch demo
+                        </button>
+                        
+                    </div>
+                    
+                    <div class="flex items-center space-x-8 text-sm text-gray-500">
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 text-success mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Free 14-day trial
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-4 h-4 text-success mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            No credit card required
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Visualization -->
+                <div style="opacity: 1; transform: none;">
+                    <div style="background: #fff; border-radius: 1rem; box-shadow: 0 10px 20px rgba(36,45,58,0.08); border: 1px solid #f1f5f9; padding: 1.5rem;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                            <div>
+                                <h3 style="font-weight: 600; color: #242d3a; margin: 0;">AAPL</h3>
+                                <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">Apple Inc.</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 2rem; font-weight: bold; color: #242d3a;">$175.43</div>
+                                <div style="color: #00c851; font-size: 1rem; font-weight: 500;">+$4.32 (+2.53%)</div>
+                            </div>
+                        </div>
+                        <svg style="width: 100%; height: 8rem;" viewBox="0 0 300 100">
+                            <defs>
+                                <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#387ef5;stop-opacity:0.2" />
+                                    <stop offset="100%" style="stop-color:#387ef5;stop-opacity:0.05" />
+                                </linearGradient>
+                            </defs>
+                            <path style="stroke-dasharray:500;stroke-dashoffset:0;animation:none;" 
+                                  d="M 20 80 Q 60 70 100 65 T 180 45 T 260 30" 
+                                  stroke="#387ef5" 
+                                  stroke-width="3" 
+                                  fill="none"/>
+                            <path d="M 20 80 Q 60 70 100 65 T 180 45 T 260 30 L 260 100 L 20 100 Z" 
+                                  fill="url(#gradient)"/>
+                            <circle cx="260" cy="30" r="4" fill="#387ef5"/>
+                        </svg>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #9ca3af; margin-top: 0.5rem;">
+                            <span>7 days ago</span>
+                            <span>Today</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Newsletter Signup Card -->
+    <!-- <div id="newsletter-card" class="fixed left-1/2 transform -translate-x-1/2 bottom-0 z-50 transition-all duration-500 ease-in-out" style="width: 420px; max-width: 95vw; margin-bottom: 0;">
+      <div class="bg-white shadow-2xl rounded-2xl px-8 py-6 flex flex-col items-center border border-brand-blue/20 newsletter-slide-up group" style="box-shadow: 0 8px 32px rgba(56,126,245,0.10);">
+        <div class="flex w-full justify-between items-center mb-2">
+          <h3 class="text-xl font-bold text-brand-navy">Stay Updated!</h3>
+          <button aria-label="Close" onclick="hideNewsletter()" class="text-gray-400 hover:text-brand-blue text-2xl font-bold leading-none focus:outline-none md:hidden">&times;</button>
+        </div>
+        <p class="text-gray-600 text-center mb-4 text-sm">Subscribe to our newsletter for the latest AI stock insights, features, and updates. No spam, ever.</p>
+        <form class="flex w-full gap-2" onsubmit="event.preventDefault(); showNewsletterSuccess();">
+          <input type="email" required placeholder="Your email address" class="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:border-brand-blue focus:outline-none text-sm" />
+          <button type="submit" class="bg-brand-blue text-white px-5 py-2 rounded-lg font-semibold transition-colors hover:bg-[#005bb5]">Subscribe</button>
+        </form>
+        <div id="newsletter-success" class="hidden text-success text-center mt-3 text-sm font-semibold">Thank you for subscribing!</div>
+      </div>
+      <style>
+        .newsletter-slide-up {
+          transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.5s cubic-bezier(0.4,0,0.2,1);
+        }
+        #newsletter-card:hover .newsletter-slide-up,
+        #newsletter-card:focus-within .newsletter-slide-up {
+          transform: translateY(110%);
+          opacity: 0.2;
+          pointer-events: none;
+        }
+        @media (max-width: 640px) {
+          #newsletter-card { width: 98vw; left: 1vw; transform: none; }
+        }
+      </style>
+    </div> -->
+    <!--Zoom Effect Cards of some things-->
+    
+
+    <!-- Stats Section -->
+    <section class="py-16 bg-white border-t border-gray-100">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center fade-up delay-100">
+                    <div class="text-3xl font-bold text-brand-navy mb-2">87%</div>
+                    <div class="text-gray-600">Prediction accuracy</div>
+                </div>
+                <div class="text-center fade-up delay-200">
+                    <div class="text-3xl font-bold text-brand-navy mb-2">50K+</div>
+                    <div class="text-gray-600">Active users</div>
+                </div>
+                <div class="text-center fade-up delay-300">
+                    <div class="text-3xl font-bold text-brand-navy mb-2">$2.4B</div>
+                    <div class="text-gray-600">Assets analyzed</div>
+                </div>
+                <div class="text-center fade-up delay-400">
+                    <div class="text-3xl font-bold text-brand-navy mb-2">99.9%</div>
+                    <div class="text-gray-600">Uptime</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-brand-light">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16 fade-up">
+                <h2 class="text-4xl font-bold text-brand-navy mb-4">
+                    Everything you need to invest smarter
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Powerful features designed to help you make better investment decisions
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="fade-up delay-100 card-hover">
+                    <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100 h-full group">
+                        <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-brand-blue transition-colors">
+                            <svg class="w-6 h-6 text-brand-blue group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-brand-navy mb-3">Real-time Analytics</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Monitor live market data with comprehensive charts, technical indicators, and performance metrics.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="fade-up delay-200 card-hover">
+                    <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100 h-full group">
+                        <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-success transition-colors">
+                            <svg class="w-6 h-6 text-success group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-brand-navy mb-3">AI Predictions</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Advanced LSTM models analyze market patterns to provide accurate 7-day price forecasts.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="fade-up delay-300 card-hover">
+                    <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100 h-full group">
+                        <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-purple-500 transition-colors">
+                            <svg class="w-6 h-6 text-purple-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-brand-navy mb-3">Smart Assistant</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Get personalized investment guidance from our AI chatbot with market insights and explanations.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="fade-up delay-400 card-hover">
+                    <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100 h-full group">
+                        <div class="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-warning transition-colors">
+                            <svg class="w-6 h-6 text-warning group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5-5-5h5v-12a3 3 0 016 0v12z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-brand-navy mb-3">Risk Management</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Advanced portfolio risk analysis with stop-loss recommendations and diversification insights.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="fade-up delay-500 card-hover">
+                    <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100 h-full group">
+                        <div class="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-indigo-500 transition-colors">
+                            <svg class="w-6 h-6 text-indigo-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-brand-navy mb-3">Mobile Trading</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Trade on-the-go with our mobile app featuring real-time alerts and instant execution.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="fade-up delay-600 card-hover">
+                    <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-100 h-full group">
+                        <div class="w-12 h-12 bg-teal-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-teal-500 transition-colors">
+                            <svg class="w-6 h-6 text-teal-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-brand-navy mb-3">Secure Platform</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Bank-level security with 256-bit encryption, two-factor authentication, and SEBI compliance.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works Section -->
+    <section id="how-it-works" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16 fade-up">
+                <h2 class="text-4xl font-bold text-brand-navy mb-4">
+                    How Predictr Works
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Get started in minutes with our simple three-step process
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="text-center fade-up delay-100">
+                    <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style="background-color: #007a33;">
+                        <span class="text-white text-xl font-bold">1</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-brand-navy mb-3">Connect Your Portfolio</h3>
+                    <p class="text-gray-600">
+                        Link your existing brokerage account or manually add your stock holdings to get started.
+                    </p>
+                </div>
+
+                <div class="text-center fade-up delay-200">
+                    <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style="background-color: #007a33;">
+                        <span class="text-white text-xl font-bold">2</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-brand-navy mb-3">AI Analysis</h3>
+                    <p class="text-gray-600">
+                        Our advanced algorithms analyze market data, news sentiment, and historical patterns.
+                    </p>
+                </div>
+
+                <div class="text-center fade-up delay-300">
+                    <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style="background-color: #007a33;">
+                        <span class="text-white text-xl font-bold">3</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-brand-navy mb-3">Get Predictions</h3>
+                    <p class="text-gray-600">
+                        Receive accurate price forecasts, risk assessments, and personalized investment recommendations.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Dashboard Preview -->
+    <section class="py-20 bg-brand-light">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16 fade-up">
+                <h2 class="text-4xl font-bold text-brand-navy mb-4">
+                    Live Dashboard Preview
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    See real market data and predictions in action
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 fade-up">
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Market Movers -->
+                    <div>
+                        <h3 class="font-semibold text-brand-navy mb-4">Top Movers</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div>
+                                    <div class="font-medium">TSLA</div>
+                                    <div class="text-sm text-gray-500">Tesla Inc</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold">$248.50</div>
+                                    <div class="text-success text-sm">+5.2%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div>
+                                    <div class="font-medium">NVDA</div>
+                                    <div class="text-sm text-gray-500">Nvidia Corp</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold">$875.30</div>
+                                    <div class="text-success text-sm">+3.8%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div>
+                                    <div class="font-medium">MSFT</div>
+                                    <div class="text-sm text-gray-500">Microsoft</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold">$420.15</div>
+                                    <div class="text-danger text-sm">-1.5%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Predictions -->
+                    <div>
+                        <h3 class="font-semibold text-brand-navy mb-4">AI Predictions</h3>
+                        <div class="space-y-3">
+                            <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium">AAPL</span>
+                                    <span class="text-success font-semibold">BULLISH</span>
+                                </div>
+                                <div class="text-sm text-gray-600 mb-2">7-day forecast: $180.50</div>
+                                <div class="text-xs text-gray-500">Confidence: 87%</div>
+                            </div>
+                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium">GOOGL</span>
+                                    <span class="text-brand-blue font-semibold">NEUTRAL</span>
+                                </div>
+                                <div class="text-sm text-gray-600 mb-2">7-day forecast: $142.80</div>
+                                <div class="text-xs text-gray-500">Confidence: 82%</div>
+                            </div>
+                            <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium">META</span>
+                                    <span class="text-danger font-semibold">BEARISH</span>
+                                </div>
+                                <div class="text-sm text-gray-600 mb-2">7-day forecast: $485.20</div>
+                                <div class="text-xs text-gray-500">Confidence: 79%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Portfolio Insights -->
+                    <div>
+                        <h3 class="font-semibold text-brand-navy mb-4">Portfolio Insights</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-blue-50 rounded-lg">
+                                <div class="text-2xl font-bold text-brand-navy">$125,430</div>
+                                <div class="text-sm text-gray-600">Total Portfolio Value</div>
+                                <div class="text-success text-sm mt-1">+$2,340 (1.9%) today</div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600">Risk Score</span>
+                                    <span class="text-warning font-medium">Medium</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600">Diversification</span>
+                                    <span class="text-success font-medium">Good</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600">AI Recommendation</span>
+                                    <span class="text-brand-blue font-medium">Hold</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+
+    <section id="testimonials" class="py-20 bg-white">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center mb-16 fade-up">
+          <h2 class="text-4xl font-bold text-brand-navy mb-4">What Our Users Say</h2>
+          <p class="text-xl text-gray-600 max-w-2xl mx-auto">Real investors share their experiences with Predictr</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 fade-up delay-100">
+            <div class="flex items-center mb-4">
+              <!-- <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User photo" class="w-12 h-12 rounded-full mr-4"> -->
+              <div>
+                <div class="font-semibold text-brand-navy">Shreya Pitre</div>
+                <div class="text-sm text-gray-500">Theater Artist</div>
+              </div>
+            </div>
+            <p class="text-gray-700 mb-4">“Predictr’s predictions have helped me make smarter trades. The dashboard is easy to use and the AI insights are spot on!”</p>
+            <div class="flex items-center">
+              <span class="text-yellow-400 mr-1">★</span><span class="text-yellow-400 mr-1">★</span><span class="text-yellow-400 mr-1">★</span><span class="text-yellow-400 mr-1">★</span><span class="text-yellow-400">★</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 fade-up delay-200">
+            <div class="flex items-center mb-4">
+              <!-- <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User photo" class="w-12 h-12 rounded-full mr-4"> -->
+              <div>
+                <div class="font-semibold text-brand-navy">Shashank Jog</div>
+                <div class="text-sm text-gray-500">Finance Blogger</div>
+              </div>
+            </div>
+            <p class="text-gray-700 mb-4">“I love the portfolio insights and risk analysis features. Predictr makes investing less stressful and more fun!”</p>
+            <div class="flex items-center">
+              <span class="text-yellow-400 mr-1">★</span><span class="text-yellow-400 mr-1">★</span><span class="text-yellow-400 mr-1">★</span><span class="text-yellow-400 mr-1">★</span><span class="text-yellow-400">★</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 fade-up delay-300">
+            <div class="flex items-center mb-4">
+              <!-- <img src="https://randomuser.me/api/portraits/men/65.jpg" alt="User photo" class="w-12 h-12 rounded-full mr-4"> -->
+              <div>
+                <div class="font-semibold text-brand-navy">Shlok A.</div>
+                <div class="text-sm text-gray-500">Professional Trader</div>
+              </div>
+            </div>
+            <p class="text-gray-700 mb-4">“The AI recommendations are very accurate. I’ve improved my returns and reduced my risks since using Predictr.”</p>
+            <div class="flex items-center">
+              <span class="text-yellow-400 mr-1">★</span><span class="text-yellow-400 mr-1">★</span><span class="text-yellow-400 mr-1">★</span><span class="text-yellow-400 mr-1">★</span><span class="text-yellow-400">★</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 bg-brand-light">
+      <div class="max-w-4xl mx-auto px-4">
+        <div class="text-center mb-12 fade-up">
+          <h2 class="text-4xl font-extrabold color-black">Frequently Asked Questions</h2>
+          <p class="text-lg text-gray-600 max-w-xl mx-auto">Find answers to common questions about Predictr, our technology, and how to get started.</p>
+        </div>
+        <div class="space-y-8">
+          <div class="bg-white border border-brand-blue/20 rounded-xl shadow-md p-6 fade-up" style="min-height: 60px;">
+            <button type="button" onclick="toggleFAQ(this)" class="w-full flex justify-between items-center text-left font-semibold text-brand-navy text-lg focus:outline-none py-2">
+              <span>What is Predictr and how does it work?</span>
+              <svg class="w-5 h-5 text-brand-blue transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="hidden mt-4 text-gray-700 text-base leading-relaxed">Predictr is a student-led platform that uses AI and machine learning to provide stock price predictions and investment insights. Simply connect your portfolio and get started with our dashboard.</div>
+          </div>
+          <div class="bg-white border border-brand-blue/20 rounded-xl shadow-md p-6 fade-up" style="min-height: 60px;">
+            <button type="button" onclick="toggleFAQ(this)" class="w-full flex justify-between items-center text-left font-semibold text-brand-navy text-lg focus:outline-none py-2">
+              <span>Is Predictr free to use?</span>
+              <svg class="w-5 h-5 text-brand-blue transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="hidden mt-4 text-gray-700 text-base leading-relaxed">Yes, Predictr offers a free trial and many features are available for educational use. Some advanced analytics may require registration.</div>
+          </div>
+          <div class="bg-white border border-brand-blue/20 rounded-xl shadow-md p-6 fade-up" style="min-height: 60px;">
+            <button type="button" onclick="toggleFAQ(this)" class="w-full flex justify-between items-center text-left font-semibold text-brand-navy text-lg focus:outline-none py-2">
+              <span>Is my data safe and private?</span>
+              <svg class="w-5 h-5 text-brand-blue transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="hidden mt-4 text-gray-700 text-base leading-relaxed">We use industry-standard security and encryption. Your data is never shared and is used only for providing predictions and insights.</div>
+          </div>
+          <div class="bg-white border border-brand-blue/20 rounded-xl shadow-md p-6 fade-up" style="min-height: 60px;">
+            <button type="button" onclick="toggleFAQ(this)" class="w-full flex justify-between items-center text-left font-semibold text-brand-navy text-lg focus:outline-none py-2">
+              <span>How do I get support or report an issue?</span>
+              <svg class="w-5 h-5 text-brand-blue transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="hidden mt-4 text-gray-700 text-base leading-relaxed">You can use the Contact Us form above, email us at <a href="mailto:support@Predictr.com" class="underline text-brand-blue">support@Predictr.com</a>, or call our support number. We aim to respond within 24 hours.</div>
+          </div>
+          <div class="bg-white border border-brand-blue/20 rounded-xl shadow-md p-6 fade-up" style="min-height: 60px;">
+            <button type="button" onclick="toggleFAQ(this)" class="w-full flex justify-between items-center text-left font-semibold text-brand-navy text-lg focus:outline-none py-2">
+              <span>Can I trust the predictions?</span>
+              <svg class="w-5 h-5 text-brand-blue transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="hidden mt-4 text-gray-700 text-base leading-relaxed">Predictr uses advanced AI models, but all predictions are for educational purposes only and should not be considered financial advice. Please consult a professional before making investment decisions.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="bg-gradient-to-br from-[#eaf6f2] via-[#f8fafd] to-[#e0e7ff] border-t border-gray-200 py-16 shadow-xl">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-8 text-xs md:text-sm text-gray-700 font-normal">
+          <div>
+            <h4 class="font-semibold text-brand-navy mb-3 tracking-wide">Account</h4>
+            <ul class="space-y-1">
+              <li><a href="#open-account" class="hover:text-brand-blue">Open demat account</a></li>
+              <li><a href="#minor-account" class="hover:text-brand-blue">Minor demat account</a></li>
+              <li><a href="#nri-account" class="hover:text-brand-blue">NRI demat account</a></li>
+              <li><a href="#commodity" class="hover:text-brand-blue">Commodity</a></li>
+              <li><a href="#dematerialisation" class="hover:text-brand-blue">Dematerialisation</a></li>
+              <li><a href="#fund-transfer" class="hover:text-brand-blue">Fund transfer</a></li>
+              <li><a href="#mtf" class="hover:text-brand-blue">MTF</a></li>
+              <li><a href="#referral" class="hover:text-brand-blue">Referral program</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-brand-navy mb-3 tracking-wide">Support</h4>
+            <ul class="space-y-1">
+              <li><a href="#contact" class="hover:text-brand-blue">Contact us</a></li>
+              <li><a href="#support-portal" class="hover:text-brand-blue">Support portal</a></li>
+              <li><a href="#complaint" class="hover:text-brand-blue">How to file a complaint?</a></li>
+              <li><a href="#complaint-status" class="hover:text-brand-blue">Status of your complaints</a></li>
+              <li><a href="#bulletin" class="hover:text-brand-blue">Bulletin</a></li>
+              <li><a href="#circular" class="hover:text-brand-blue">Circular</a></li>
+              <li><a href="#blog" class="hover:text-brand-blue">Z-Connect blog</a></li>
+              <li><a href="#downloads" class="hover:text-brand-blue">Downloads</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-brand-navy mb-3 tracking-wide">Company</h4>
+            <ul class="space-y-1">
+              <li><a href="#about" class="hover:text-brand-blue">About</a></li>
+              <li><a href="#philosophy" class="hover:text-brand-blue">Philosophy</a></li>
+              <li><a href="#press" class="hover:text-brand-blue">Press & media</a></li>
+              <li><a href="#careers" class="hover:text-brand-blue">Careers</a></li>
+              <li><a href="#csr" class="hover:text-brand-blue">Predictr Cares (CSR)</a></li>
+              <li><a href="#tech" class="hover:text-brand-blue">Predictr.tech</a></li>
+              <li><a href="#opensource" class="hover:text-brand-blue">Open source</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-brand-navy mb-3 tracking-wide">Quick links</h4>
+            <ul class="space-y-1">
+              <li><a href="#ipos" class="hover:text-brand-blue">Upcoming IPOs</a></li>
+              <li><a href="#brokerage" class="hover:text-brand-blue">Brokerage charges</a></li>
+              <li><a href="#holidays" class="hover:text-brand-blue">Market holidays</a></li>
+              <li><a href="#calendar" class="hover:text-brand-blue">Economic calendar</a></li>
+              <li><a href="#calculators" class="hover:text-brand-blue">Calculators</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-brand-navy mb-3 tracking-wide">Markets</h4>
+            <ul class="space-y-1">
+              <li><a href="#sectors" class="hover:text-brand-blue">Sectors</a></li>
+            </ul>
+          </div>
+          <div class="md:col-span-1">
+            <div class="mb-2">
+              <span class="text-base font-bold text-brand-navy">©2025, Predictr Broking Ltd.</span>
+              <div class="text-xs text-gray-500">All rights reserved.</div>
+            </div>
+          </div>
+        </div>
+        <div class="border-t border-gray-100 mt-8 pt-6 text-xs text-gray-600">
+          <div class="mb-2">
+            Predictr Technologies: This is a student-led technology platform for stock price prediction and investment education. All information, tools, and forecasts are provided for educational and demonstration purposes only and do not constitute investment, tax, or legal advice. Predictr is not registered with SEBI, RBI, or any financial authority, and does not offer broking, depository, or commodity trading services.
+          </div>
+          <div class="mb-2">
+            Registered Address: Predictr Technologies, 1234 Financial District, Mumbai, Maharashtra, 400001, India. For any queries or feedback, please write to <a href="mailto:support@Predictr.com" class="underline text-brand-blue">support@Predictr.com</a>. Please read all risk disclosures and terms before using the platform.
+          </div>
+          <div class="mb-2">
+            Procedure to report issues or feedback: Use our support portal or email. Mandatory details: Name, Email, and description of your issue. Benefits: Effective communication and speedy resolution.
+          </div>
+          <div class="mb-2">
+            Online Dispute Resolution | Grievances Redressal Mechanism: As a student project, Predictr is committed to transparency and user support, but is not subject to regulatory grievance mechanisms.
+          </div>
+          <div class="mb-2">
+            Investments in securities markets are subject to market risks; read all related documents carefully before investing. All predictions and analytics are for educational use only.
+          </div>
+          <div class="mb-2">
+            <strong>Attention users:</strong> 1) Predictr does not accept or manage client funds or securities. 2) Update your contact details to receive important notifications. 3) Check your investment records regularly.
+          </div>
+          <div class="mb-2">
+            India’s leading student project for AI-powered stock prediction and education.
+          </div>
+          <div class="mb-2">
+            "Prevent unauthorized actions in your account. Update your contact details. All information is provided directly by Predictr for educational purposes. KYC and regulatory compliance are not applicable to this platform. If you receive any investment advice or solicitation claiming to be from Predictr, please report it via our support portal."
+          </div>
+          
+          <div style="margin:0;padding:0;">
+            <div class="flex flex-wrap justify-center items-center gap-2 bg-[#eaf6f2] rounded-lg shadow-sm font-semibold text-sm" style="padding:0;margin:0;">
+              <a href="#terms" class="hover:text-brand-blue transition-colors px-12 py-1">Terms & conditions</a>
+              <a href="#privacy" class="hover:text-brand-blue transition-colors px-12 py-1">Privacy policy</a>
+              <a href="#disclosure" class="hover:text-brand-blue transition-colors px-12 py-1">Disclosure</a>
+              <a href="#user-attention" class="hover:text-brand-blue transition-colors px-12 py-1">For user’s attention</a>
+              <a href="#charter" class="hover:text-brand-blue transition-colors px-12 py-1">Project charter</a>
+            </div>
+          </div>
+          <br>
+          <br>
+          <!-- Social Media Links -->
+            <div class="flex items-center space-x-6">
+                <a href="https://twitter.com/yourprofile" target="_blank" rel="noopener noreferrer">
+                    <img src="assets/elements/xcorp.svg" alt="Twitter Logo" class="h-10 w-auto" />
+                </a>
+                <a href="https://linkedin.com/in/yourprofile" target="_blank" rel="noopener noreferrer">
+                    <img src="assets/elements/linkedin.svg" alt="LinkedIn Logo" class="h-10 w-auto" />
+                </a>
+                <a href="https://github.com/yourprofile" target="_blank" rel="noopener noreferrer">
+                    <img src="assets/elements/facebook.svg" alt="GitHub Logo" class="h-10 w-auto" />
+                </a>
+                <a href="https://github.com/yourprofile" target="_blank" rel="noopener noreferrer">
+                    <img src="assets/elements/youtube.svg" alt="GitHub Logo" class="h-10 w-auto" />
+                </a>
+                <a href="https://github.com/yourprofile" target="_blank" rel="noopener noreferrer">
+                    <img src="assets/elements/instagram.svg" alt="GitHub Logo" class="h-10 w-auto" />
+                </a>
+                <!-- Add more social icons as needed -->
+            </div>
+
+
+           <!--Social Media Links-->
+           
+        </div>
+      </div>
+    </footer>
+
+    <script>
+        // Newsletter hide/show logic
+        // function hideNewsletter() {
+        //   document.getElementById('newsletter-card').style.display = 'none';
+        // }
+        // function showNewsletterSuccess() {
+        //   document.getElementById('newsletter-success').classList.remove('hidden');
+        //   setTimeout(() => {
+        //     document.getElementById('newsletter-card').style.display = 'none';
+        //   }, 2000);
+        // }
+        // FAQ Toggle Function
+        function toggleFAQ(button) {
+            const content = button.nextElementSibling;
+            const icon = button.querySelector('svg');
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                content.style.maxHeight = '0px';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-up').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

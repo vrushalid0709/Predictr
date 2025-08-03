@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictr - Contact Us</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-blue': '#387ef5',
+                        'brand-navy': '#242d3a',
+                        'brand-light': '#f8fafd',
+                        'success': '#00c851',
+                        'warning': '#ff9f43',
+                        'danger': '#ee5a52',
+                        'muted': '#9eb3c2'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        .fade-up { opacity: 0; transform: translateY(40px); animation: fadeUp 0.8s ease-out forwards; }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .gradient-text {
+            background: linear-gradient(45deg, #387ef5, #00c851);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="bg-white text-brand-navy antialiased">
+
+    <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-brand-blue rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                        </svg>
+                    </div>
+                    <a href="../index.html" class="text-xl font-semibold text-brand-navy">Predictr</a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                  <a href="../index.html" class="text-brand-blue font-medium transition-colors">Home</a>
+                    <!-- <a href="index.html#features" class="text-gray-600 hover:text-brand-blue transition-colors">Features</a>
+                    <a href="index.html#how-it-works" class="text-gray-600 hover:text-brand-blue transition-colors">How it works</a> -->
+                    <!-- <a href="index.html#faq" class="text-gray-600 hover:text-brand-blue transition-colors">FAQ</a> -->
+                    <a href="contact.html" class="text-brand-blue font-medium transition-colors">Contact Us</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- <button class="text-gray-600 hover:text-brand-blue transition-colors font-medium">Login</button> -->
+                    <button
+                    class="bg-brand-blue text-black px-6 py-2 rounded-lg transition-colors font-medium shadow-lg"
+                    style="background-color:white;"
+                    onmouseover="this.style.backgroundColor='#b2e0d4';"
+                    onmouseout="this.style.backgroundColor='white';"
+                  >
+                    Login
+                  </button>
+                    <button
+                    class="bg-brand-blue text-black px-6 py-2 rounded-lg transition-colors font-medium shadow-lg"
+                    style="background-color:white;"
+                    onmouseover="this.style.backgroundColor='#b2e0d4';"
+                    onmouseout="this.style.backgroundColor='white';"
+                  >
+                    Get started
+                  </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section id="contact-us" class="pt-32 pb-20 bg-gradient-to-b from-brand-light to-white">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="grid lg:grid-cols-2 gap-16 items-start">
+          <div class="fade-up">
+            <h1 class="text-5xl font-bold text-brand-navy mb-4">Get in touch</h1>
+            <p class="text-lg text-gray-600 mb-8 max-w-lg">
+              We're here to help you with any questions about our features, pricing, or anything else. Reach out and let us know how we can assist you.
+            </p>
+            <div class="space-y-6">
+              <div class="flex items-start space-x-4">
+                <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                  <svg class="w-6 h-6 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-brand-navy">Email Us</h3>
+                  <p class="text-gray-600">Our team will get back to you within 24 hours.</p>
+                  <a href="mailto:support@Predictr.com" class="text-brand-blue font-medium hover:underline">support@Predictr.com</a>
+                </div>
+              </div>
+              <div class="flex items-start space-x-4">
+                <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                   <svg class="w-6 h-6 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-brand-navy">Call Us</h3>
+                  <p class="text-gray-600">Mon-Fri from 9am to 5pm IST.</p>
+                  <a href="tel:+912212345678" class="text-brand-blue font-medium hover:underline">+91-22-1234-5678</a>
+                </div>
+              </div>
+              <div class="flex items-start space-x-4">
+                 <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                 </div>
+                 <div>
+                    <h3 class="text-lg font-semibold text-brand-navy">Visit Us</h3>
+                    <p class="text-gray-600">1234 Financial District, <br> Mumbai, Maharashtra, 400001, India</p>
+                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 fade-up delay-200">
+            <h2 class="text-2xl font-bold text-brand-navy mb-6">Send us a message</h2>
+            <form class="space-y-6">
+              <div>
+                <label for="name" class="block text-sm font-medium text-brand-navy mb-1">Name</label>
+                <input type="text" id="name" name="name" required class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue transition-shadow" placeholder="Your Name">
+              </div>
+              <div>
+                <label for="email" class="block text-sm font-medium text-brand-navy mb-1">Email</label>
+                <input type="email" id="email" name="email" required class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue transition-shadow" placeholder="you@email.com">
+              </div>
+              <div>
+                <label for="message" class="block text-sm font-medium text-brand-navy mb-1">Message</label>
+                <textarea id="message" name="message" rows="5" required class="w-full px-4 py-3 border border-gray-200 bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue transition-shadow" placeholder="Type your message..."></textarea>
+              </div>
+              <button
+                    class="w-full text-black px-6 py-2 rounded-lg transition-colors font-medium shadow-lg"
+                    style="background-color:white;"
+                    onmouseover="this.style.backgroundColor='#b2e0d4';"
+                    onmouseout="this.style.backgroundColor='white';"
+                  >
+                    Send Message
+                  </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- <section id="faq" class="py-20 bg-brand-light">
+      <div class="max-w-4xl mx-auto px-4">
+        <div class="text-center mb-12 fade-up">
+          <h2 class="text-4xl font-extrabold gradient-text mb-4">Frequently Asked Questions</h2>
+          <p class="text-lg text-gray-600 max-w-xl mx-auto">Find answers to common questions about Predictr, our technology, and how to get started.</p>
+        </div>
+        <div class="space-y-4">
+          <div class="bg-white border border-brand-blue/20 rounded-xl shadow-md p-4 fade-up delay-100">
+            <button type="button" onclick="toggleFAQ(this)" class="w-full flex justify-between items-center text-left font-semibold text-brand-navy text-lg focus:outline-none py-2">
+              <span>What is Predictr and how does it work?</span>
+              <svg class="w-5 h-5 text-brand-blue transition-transform transform-gpu" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="mt-4 text-gray-700 text-base leading-relaxed overflow-hidden transition-all duration-500 ease-in-out" style="max-height: 0px;">Predictr is a student-led platform that uses AI and machine learning to provide stock price predictions and investment insights. Simply connect your portfolio and get started with our dashboard.</div>
+          </div>
+          <div class="bg-white border border-brand-blue/20 rounded-xl shadow-md p-4 fade-up delay-200">
+            <button type="button" onclick="toggleFAQ(this)" class="w-full flex justify-between items-center text-left font-semibold text-brand-navy text-lg focus:outline-none py-2">
+              <span>How do I get support or report an issue?</span>
+              <svg class="w-5 h-5 text-brand-blue transition-transform transform-gpu" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="mt-4 text-gray-700 text-base leading-relaxed overflow-hidden transition-all duration-500 ease-in-out" style="max-height: 0px;">You can use the Contact Us form above, email us at <a href="mailto:support@Predictr.com" class="underline text-brand-blue">support@Predictr.com</a>, or call our support number. We aim to respond within 24 hours.</div>
+          </div>
+          <div class="bg-white border border-brand-blue/20 rounded-xl shadow-md p-4 fade-up delay-300">
+            <button type="button" onclick="toggleFAQ(this)" class="w-full flex justify-between items-center text-left font-semibold text-brand-navy text-lg focus:outline-none py-2">
+              <span>Can I trust the predictions?</span>
+              <svg class="w-5 h-5 text-brand-blue transition-transform transform-gpu" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="mt-4 text-gray-700 text-base leading-relaxed overflow-hidden transition-all duration-500 ease-in-out" style="max-height: 0px;">Predictr uses advanced AI models, but all predictions are for educational purposes only and should not be considered financial advice. Please consult a professional before making investment decisions.</div>
+          </div>
+        </div>
+      </div>
+    </section> -->
+
+    <footer class="bg-gradient-to-br from-[#eaf6f2] via-[#f8fafd] to-[#e0e7ff] border-t border-gray-200 py-16 shadow-xl">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-8 text-xs md:text-sm text-gray-700 font-normal">
+          <div>
+            <h4 class="font-semibold text-brand-navy mb-3 tracking-wide">Account</h4>
+            <ul class="space-y-1">
+              <li><a href="#open-account" class="hover:text-brand-blue">Open demat account</a></li>
+              <li><a href="#minor-account" class="hover:text-brand-blue">Minor demat account</a></li>
+              <li><a href="#nri-account" class="hover:text-brand-blue">NRI demat account</a></li>
+              <li><a href="#commodity" class="hover:text-brand-blue">Commodity</a></li>
+              <li><a href="#dematerialisation" class="hover:text-brand-blue">Dematerialisation</a></li>
+              <li><a href="#fund-transfer" class="hover:text-brand-blue">Fund transfer</a></li>
+              <li><a href="#mtf" class="hover:text-brand-blue">MTF</a></li>
+              <li><a href="#referral" class="hover:text-brand-blue">Referral program</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-brand-navy mb-3 tracking-wide">Support</h4>
+            <ul class="space-y-1">
+              <li><a href="#contact" class="hover:text-brand-blue">Contact us</a></li>
+              <li><a href="#support-portal" class="hover:text-brand-blue">Support portal</a></li>
+              <li><a href="#complaint" class="hover:text-brand-blue">How to file a complaint?</a></li>
+              <li><a href="#complaint-status" class="hover:text-brand-blue">Status of your complaints</a></li>
+              <li><a href="#bulletin" class="hover:text-brand-blue">Bulletin</a></li>
+              <li><a href="#circular" class="hover:text-brand-blue">Circular</a></li>
+              <li><a href="#blog" class="hover:text-brand-blue">Z-Connect blog</a></li>
+              <li><a href="#downloads" class="hover:text-brand-blue">Downloads</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-brand-navy mb-3 tracking-wide">Company</h4>
+            <ul class="space-y-1">
+              <li><a href="#about" class="hover:text-brand-blue">About</a></li>
+              <li><a href="#philosophy" class="hover:text-brand-blue">Philosophy</a></li>
+              <li><a href="#press" class="hover:text-brand-blue">Press & media</a></li>
+              <li><a href="#careers" class="hover:text-brand-blue">Careers</a></li>
+              <li><a href="#csr" class="hover:text-brand-blue">Predictr Cares (CSR)</a></li>
+              <li><a href="#tech" class="hover:text-brand-blue">Predictr.tech</a></li>
+              <li><a href="#opensource" class="hover:text-brand-blue">Open source</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-brand-navy mb-3 tracking-wide">Quick links</h4>
+            <ul class="space-y-1">
+              <li><a href="#ipos" class="hover:text-brand-blue">Upcoming IPOs</a></li>
+              <li><a href="#brokerage" class="hover:text-brand-blue">Brokerage charges</a></li>
+              <li><a href="#holidays" class="hover:text-brand-blue">Market holidays</a></li>
+              <li><a href="#calendar" class="hover:text-brand-blue">Economic calendar</a></li>
+              <li><a href="#calculators" class="hover:text-brand-blue">Calculators</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-brand-navy mb-3 tracking-wide">Markets</h4>
+            <ul class="space-y-1">
+              <li><a href="#sectors" class="hover:text-brand-blue">Sectors</a></li>
+            </ul>
+          </div>
+          <div class="md:col-span-1">
+            <div class="mb-2">
+              <span class="text-base font-bold text-brand-navy">©2025, Predictr Broking Ltd.</span>
+              <div class="text-xs text-gray-500">All rights reserved.</div>
+            </div>
+          </div>
+        </div>
+        <div class="border-t border-gray-100 mt-8 pt-6 text-xs text-gray-600">
+          <div class="mb-2">
+            Predictr Technologies: This is a student-led technology platform for stock price prediction and investment education. All information, tools, and forecasts are provided for educational and demonstration purposes only and do not constitute investment, tax, or legal advice. Predictr is not registered with SEBI, RBI, or any financial authority, and does not offer broking, depository, or commodity trading services.
+          </div>
+          <div class="mb-2">
+            Registered Address: Predictr Technologies, 1234 Financial District, Mumbai, Maharashtra, 400001, India. For any queries or feedback, please write to <a href="mailto:support@Predictr.com" class="underline text-brand-blue">support@Predictr.com</a>. Please read all risk disclosures and terms before using the platform.
+          </div>
+          <div class="mb-2">
+            Procedure to report issues or feedback: Use our support portal or email. Mandatory details: Name, Email, and description of your issue. Benefits: Effective communication and speedy resolution.
+          </div>
+          <div class="mb-2">
+            Online Dispute Resolution | Grievances Redressal Mechanism: As a student project, Predictr is committed to transparency and user support, but is not subject to regulatory grievance mechanisms.
+          </div>
+          <div class="mb-2">
+            Investments in securities markets are subject to market risks; read all related documents carefully before investing. All predictions and analytics are for educational use only.
+          </div>
+          <div class="mb-2">
+            <strong>Attention users:</strong> 1) Predictr does not accept or manage client funds or securities. 2) Update your contact details to receive important notifications. 3) Check your investment records regularly.
+          </div>
+          <div class="mb-2">
+            India’s leading student project for AI-powered stock prediction and education.
+          </div>
+          <div class="mb-2">
+            "Prevent unauthorized actions in your account. Update your contact details. All information is provided directly by Predictr for educational purposes. KYC and regulatory compliance are not applicable to this platform. If you receive any investment advice or solicitation claiming to be from Predictr, please report it via our support portal."
+          </div>
+          
+          <div style="margin:0;padding:0;">
+            <div class="flex flex-wrap justify-center items-center gap-2 bg-[#eaf6f2] rounded-lg shadow-sm font-semibold text-sm" style="padding:0;margin:0;">
+              <a href="#terms" class="hover:text-brand-blue transition-colors px-12 py-1">Terms & conditions</a>
+              <a href="#privacy" class="hover:text-brand-blue transition-colors px-12 py-1">Privacy policy</a>
+              <a href="#disclosure" class="hover:text-brand-blue transition-colors px-12 py-1">Disclosure</a>
+              <a href="#user-attention" class="hover:text-brand-blue transition-colors px-12 py-1">For user’s attention</a>
+              <a href="#charter" class="hover:text-brand-blue transition-colors px-12 py-1">Project charter</a>
+            </div>
+          </div>
+          <br>
+          <br>
+          <!-- Social Media Links -->
+            <div class="flex items-center space-x-6">
+                <a href="https://twitter.com/yourprofile" target="_blank" rel="noopener noreferrer">
+                    <img src="../assets/elements/xcorp.svg" alt="Twitter Logo" class="h-10 w-auto" />
+                </a>
+                <a href="https://linkedin.com/in/yourprofile" target="_blank" rel="noopener noreferrer">
+                    <img src="../assets/elements/linkedin.svg" alt="LinkedIn Logo" class="h-10 w-auto" />
+                </a>
+                <a href="https://github.com/yourprofile" target="_blank" rel="noopener noreferrer">
+                    <img src="../assets/elements/facebook.svg" alt="GitHub Logo" class="h-10 w-auto" />
+                </a>
+                <a href="https://github.com/yourprofile" target="_blank" rel="noopener noreferrer">
+                    <img src="../assets/elements/youtube.svg" alt="GitHub Logo" class="h-10 w-auto" />
+                </a>
+                <a href="https://github.com/yourprofile" target="_blank" rel="noopener noreferrer">
+                    <img src="../assets/elements/instagram.svg" alt="GitHub Logo" class="h-10 w-auto" />
+                </a>
+                <!-- Add more social icons as needed -->
+            </div>
+
+
+           <!--Social Media Links-->
+           
+        </div>
+      </div>
+    </footer>
+
+
+    <script>
+        // FAQ Toggle Function
+        function toggleFAQ(button) {
+            const content = button.nextElementSibling;
+            const icon = button.querySelector('svg');
+            
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                content.style.maxHeight = '0px';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    // Optional: unobserve after animation
+                    // observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-up').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Add a style for the is-visible class to trigger the animation
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = ".fade-up.is-visible { animation-name: fadeUp; }";
+        document.head.appendChild(styleSheet);
+
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
