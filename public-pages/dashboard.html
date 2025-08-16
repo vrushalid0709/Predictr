@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Predictr — User Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'brand-blue': '#387ef5',
+            'brand-navy': '#242d3a',
+            'brand-light': '#f8fafd',
+            'success': '#00c851',
+            'warning': '#ff9f43',
+            'danger': '#ee5a52',
+            'muted': '#9eb3c2'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .fade-up { opacity: 0; transform: translateY(12px); animation: fadeUp .5s ease-out forwards; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+    .card-hover { transition: all .25s cubic-bezier(.4,0,.2,1); }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(36,45,58,.08); }
+    .gradient-text { background: linear-gradient(45deg,#387ef5,#00c851); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  </style>
+</head>
+<body class="bg-white text-brand-navy antialiased">
+
+  <!-- Top Nav -->
+  <nav class="fixed top-0 inset-x-0 bg-white/95  border-gray-100 backdrop-blur z-50">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 bg-brand-blue rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+          </div>
+          <!--Add Company Logo-->
+          <img src="{{ url_for('static', filename='assets/logo_file/svg/color-logo.svg') }}" class="w-30 h-30 rounded-lg" alt="Company Logo"/>
+          <!-- <span class="text-lg font-semibold">Predictr Dashboard</span> -->
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="hidden sm:flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
+            <span class="text-xs text-gray-500">Currency</span>
+            <select id="currencySelect" class="bg-transparent text-sm outline-none">
+              <option value="INR">INR ₹</option>
+              <option value="USD">USD $</option>
+              <option value="EUR">EUR €</option>
+              <option value="GBP">GBP £</option>
+            </select>
+          </div>
+          <button id="themeToggle" class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm hover:bg-gray-50">Light</button>
+          <div class="flex items-center gap-2">
+            <img src="{{ url_for('static', filename='assets/elements/user.png') }}" class="w-8 h-8 rounded-full" alt="avatar"/>
+            <span class="hidden sm:block text-sm font-medium">Hi, Alex</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="pt-20 max-w-7xl mx-auto px-4 grid grid-cols-12 gap-6">
+    <!-- Sidebar -->
+    <aside class="col-span-12 md:col-span-3 lg:col-span-2">
+      <div class="bg-brand-light border border-gray-100 rounded-2xl p-3 md:p-4 sticky top-24">
+        <a data-nav="overview" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover bg-white shadow">Overview</a>
+        <a data-nav="mystocks" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">My Stocks</a>
+        <a data-nav="transactions" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">Transactions</a>
+        <a data-nav="settings" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">Settings</a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="col-span-12 md:col-span-9 lg:col-span-10 space-y-6 pb-16">
+      <!-- Overview -->
+  <section id="section-overview">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl md:text-3xl font-bold">Portfolio Overview</h1>
+          <button id="refreshPrices" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border-b hover:bg-[#b2e0d4]">Update Prices</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+          <!-- Cards -->
+          <div class="bg-white border border-gray-100 rounded-2xl p-5 card-hover">
+            <div class="text-sm text-gray-500">Total Invested</div>
+            <div id="kpi-invested" class="text-2xl font-semibold mt-1">—</div>
+          </div>
+          <div class="bg-white border border-gray-100 rounded-2xl p-5 card-hover">
+            <div class="text-sm text-gray-500">Current Value</div>
+            <div id="kpi-current" class="text-2xl font-semibold mt-1">—</div>
+          </div>
+          <div class="bg-white border border-gray-100 rounded-2xl p-5 card-hover">
+            <div class="text-sm text-gray-500">P/L (Abs)</div>
+            <div id="kpi-pl" class="text-2xl font-semibold mt-1">—</div>
+          </div>
+          <div class="bg-white border border-gray-100 rounded-2xl p-5 card-hover">
+            <div class="text-sm text-gray-500">P/L (%)</div>
+            <div id="kpi-plp" class="text-2xl font-semibold mt-1">—</div>
+          </div>
+        </div>
+
+        <!-- Mini chart (static SVG sparkline based on data) -->
+        <!-- <div class="bg-white border border-gray-100 rounded-2xl p-5 mt-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="font-semibold">Portfolio Sparkline</div>
+            <div class="text-xs text-gray-500">Last 7 points</div>
+          </div>
+          <svg id="sparkline" viewBox="0 0 300 60" class="w-full h-16">
+            <defs>
+              <linearGradient id="sparkGrad" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#387ef5" stop-opacity="0.25" />
+                <stop offset="100%" stop-color="#387ef5" stop-opacity="0.05" />
+              </linearGradient>
+            </defs>
+            <path id="sparkPath" d="" stroke="#387ef5" stroke-width="2.5" fill="none" />
+            <path id="sparkFill" d="" fill="url(#sparkGrad)" />
+          </svg>
+        </div> -->
+
+        <!-- Search Bar for Stocks -->
+<div class="bg-white border border-gray-100 rounded-2xl p-5 mt-6 flex items-center gap-3">
+  <input id="stockSearchInput" type="text" class="border border-gray-200 rounded-lg px-4 py-2 w-full" placeholder="Search your stocks by symbol or name..." />
+  <button id="stockSearchBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Search</button>
+</div>
+
+<!-- Prediction Graph and Info Blocks -->
+<div class="grid grid-cols-1 md:grid-cols-5 gap-6 mt-6">
+  <!-- Graph (Prediction) -->
+  <div class="col-span-2 bg-white border border-gray-100 rounded-2xl p-5 flex flex-col">
+    <div class="flex items-center justify-between mb-2">
+      <div class="font-semibold">Stock Prediction Graph</div>
+      <div class="flex items-center gap-2">
+        <label for="predictionRange" class="text-xs text-gray-500">Range:</label>
+        <select id="predictionRange" class="border border-gray-200 rounded-lg px-2 py-1 text-xs">
+          <option value="7">7 Days</option>
+          <option value="30">1 Month</option>
+          <option value="90">3 Months</option>
+          <option value="365">1 Year</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex-1 flex items-center justify-center">
+      <!-- Placeholder for prediction graph -->
+      <canvas id="predictionGraph" class="w-full h-48"></canvas>
+    </div>
+    <div class="mt-2 text-xs text-gray-500">Scroll or select range to view predictions for next n days/months/years.</div>
+  </div>
+  <!-- Info Blocks -->
+  <div class="col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
+    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+      <div class="text-sm text-gray-500">Amount Invested</div>
+      <div id="info-invested" class="text-xl font-semibold mt-1">—</div>
+    </div>
+    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+      <div class="text-sm text-gray-500">Predicted Value</div>
+      <div id="info-predicted" class="text-xl font-semibold mt-1">—</div>
+    </div>
+    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+      <div class="text-sm text-gray-500">Prediction Accuracy</div>
+      <div id="info-accuracy" class="text-xl font-semibold mt-1">—</div>
+    </div>
+    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+      <div class="text-sm text-gray-500">Other Details</div>
+      <div id="info-other" class="text-xl font-semibold mt-1">—</div>
+    </div>
+  </div>
+</div>
+      </section>
+
+
+      <!-- My Stocks -->
+  <section id="section-mystocks" class="hidden">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl md:text-2xl font-bold">My Stocks</h2>
+          <div class="flex items-center gap-2">
+            <button id="openAddModal" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border-b hover:bg-[#b2e0d4]">Add Stock</button>
+            <button id="clearAllBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border-b hover:bg-[#b2e0d4]">Clear All</button>
+          </div>
+        </div>
+
+        <div class="mt-4 overflow-x-auto bg-white border border-gray-100 rounded-2xl">
+          <table class="min-w-full text-sm">
+            <thead class="bg-brand-light text-gray-600">
+              <tr>
+                <th class="text-left p-3">Symbol</th>
+                <th class="text-left p-3">Company</th>
+                <th class="text-right p-3">Qty</th>
+                <th class="text-right p-3">Buy Price</th>
+                <th class="text-right p-3">Current Price</th>
+                <th class="text-right p-3">P/L</th>
+                <th class="text-right p-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="stocksTbody" class="divide-y divide-gray-100"></tbody>
+          </table>
+        </div>
+        <div class="h-25"></div>
+      </section>
+
+      
+
+      <!-- Transactions -->
+  <section id="section-transactions" class="hidden">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl md:text-2xl font-bold">Transactions</h2>
+          <div class="text-sm text-gray-500">Auto-generated from your buys/sells</div>
+        </div>
+        <div class="mt-4 overflow-x-auto bg-white border border-gray-100 rounded-2xl">
+          <table class="min-w-full text-sm">
+            <thead class="bg-brand-light text-gray-600">
+              <tr>
+                <th class="text-left p-3">Date</th>
+                <th class="text-left p-3">Symbol</th>
+                <th class="text-left p-3">Type</th>
+                <th class="text-right p-3">Qty</th>
+                <th class="text-right p-3">Price</th>
+                <th class="text-right p-3">Total</th>
+              </tr>
+            </thead>
+            <tbody id="txTbody" class="divide-y divide-gray-100"></tbody>
+          </table>
+        </div>
+        <div class="h-50"></div>
+      </section>
+
+      <!-- Settings -->
+  <section id="section-settings" class="hidden">
+        <h2 class="text-xl md:text-2xl font-bold mb-4">Settings</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="bg-white border border-gray-100 rounded-2xl p-5">
+            <div class="font-semibold mb-3">Currency</div>
+            <p class="text-sm text-gray-600 mb-2">Choose the display currency for your portfolio.</p>
+            <select id="currencySelect2" class="border border-gray-200 rounded-lg px-3 py-2 w-full">
+              <option value="INR">INR ₹</option>
+              <option value="USD">USD $</option>
+              <option value="EUR">EUR €</option>
+              <option value="GBP">GBP £</option>
+            </select>
+          </div>
+          <div class="bg-white border border-gray-100 rounded-2xl p-5">
+            <div class="font-semibold mb-3">Theme</div>
+            <p class="text-sm text-gray-600 mb-2">Light/Dark theme preference.</p>
+            <button id="themeToggle2" class="px-4 py-2 border rounded-lg">Toggle Theme</button>
+          </div>
+        </div>
+        <div class="h-25"></div>
+      </section>
+    </main>
+  </div>
+  
+
+  <!-- Add/Edit Stock Modal -->
+  <div id="stockModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center z-[60]">
+    <div class="bg-white w-full max-w-lg rounded-2xl p-6 border border-gray-100 shadow-xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="modalTitle" class="text-lg font-semibold">Add Stock</h3>
+        <button id="closeModal" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center">✕</button>
+      </div>
+      <form id="stockForm" class="grid grid-cols-2 gap-4">
+        <div class="col-span-1">
+          <label class="text-sm text-gray-600">Stock Symbol</label>
+          <input id="fSymbol" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="AAPL" />
+        </div>
+        <div class="col-span-1">
+          <label class="text-sm text-gray-600">Company Name</label>
+          <input id="fCompanyInput" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="Apple Inc." />
+        </div>
+        <div class="col-span-2 flex items-center gap-2">
+          <button type="button" id="lookupBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Fetch Details</button>
+          <span id="lookupStatus" class="text-sm text-success"></span>
+        </div>
+        <div class="col-span-1">
+          <label class="text-sm text-gray-600">Company Name</label>
+          <input id="fCompany" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 bg-brand-light text-gray-500" readonly />
+        </div>
+        <div class="col-span-1">
+          <label class="text-sm text-gray-600">Exchange</label>
+          <input id="fExchange" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 bg-brand-light text-gray-500" readonly />
+        </div>
+        <div class="col-span-1">
+          <label class="text-sm text-gray-600">Currency</label>
+          <input id="fCurrency" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 bg-brand-light text-gray-500" readonly />
+        </div>
+        <div class="col-span-1">
+          <label class="text-sm text-gray-600">Sector</label>
+          <input id="fSector" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 bg-brand-light text-gray-500" readonly />
+        </div>
+        <div class="col-span-1">
+          <label class="text-sm text-gray-600">Quantity</label>
+          <input id="fQty" type="number" min="1" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="10" required />
+        </div>
+        <div class="col-span-1">
+          <label class="text-sm text-gray-600">Buy Price</label>
+          <input id="fBuy" type="number" min="0" step="0.01" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="175.50" required />
+        </div>
+        <div class="col-span-1">
+          <label class="text-sm text-gray-600">Current Price</label>
+          <input id="fCurrent" type="number" min="0" step="0.01" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="180.20" required />
+        </div>
+        <div class="col-span-1">
+          <label class="text-sm text-gray-600">Date</label>
+          <input id="fDate" type="date" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" required />
+        </div>
+        <input type="hidden" id="editingIndex" value="" />
+        <div class="col-span-2 flex items-center justify-end gap-3 mt-2">
+          <button type="button" id="cancelModal" class="px-4 py-2 border rounded-lg">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-brand-blue text-white rounded-lg">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!--Push footer down-->
+    <div class="h-40"></div>
+
+  <footer class="mt-10 border-t border-gray-100 py-8 bg-brand-light">
+    <div class="max-w-7xl mx-auto px-4 text-sm text-gray-600 flex flex-wrap items-center justify-between gap-4">
+      <div>© <span id="year"></span> Predictr — Dashboard</div>
+      <div class="flex items-center gap-4">
+        <a href="#" class="hover:text-brand-blue">Terms</a>
+        <a href="#" class="hover:text-brand-blue">Privacy</a>
+        <a href="#" class="hover:text-brand-blue">Support</a>
+      </div>
+    </div>
+  </footer>
+
+<script>
+  // ===== Mock currency rates (relative to USD) =====
+  const FX = { USD: 1, EUR: 0.92, GBP: 0.78, INR: 84 };
+  const DEFAULT_CCY = localStorage.getItem('predictr_ccy') || 'INR';
+
+  // ===== State =====
+  let state = JSON.parse(localStorage.getItem('predictr_state')||'null') || {
+    currency: DEFAULT_CCY,
+    theme: localStorage.getItem('predictr_theme') || 'light',
+    stocks: [
+      { symbol:'AAPL', company:'Apple Inc.', qty:10, buy:150, current:175, date:'2025-01-10' },
+      { symbol:'INFY', company:'Infosys Ltd', qty:20, buy:1450, current:1585, date:'2025-02-01' }
+    ],
+    transactions: [] // auto from stocks add/edit/delete
+  };
+
+  // ===== Utilities =====
+  const el = sel => document.querySelector(sel);
+  const els = sel => Array.from(document.querySelectorAll(sel));
+  const fmt = (v) => {
+    const cur = state.currency;
+    const usd = v; // values are kept in USD-equivalents for simplicity
+    const converted = usd * (cur==='USD'?1:(FX[cur]/FX['USD']));
+    const symbol = cur==='USD'?'$':cur==='EUR'?'€':cur==='GBP'?'£':'₹';
+    return symbol + converted.toLocaleString(undefined,{maximumFractionDigits:2});
+  };
+  const save = () => {
+    localStorage.setItem('predictr_state', JSON.stringify(state));
+    localStorage.setItem('predictr_ccy', state.currency);
+    localStorage.setItem('predictr_theme', state.theme);
+  };
+  const setTheme = (t) => {
+    state.theme = t; save();
+    document.documentElement.classList.toggle('dark', t==='dark');
+    document.body.style.backgroundColor = t==='dark' ? '#0b1220' : '#ffffff';
+    document.body.style.color = t==='dark' ? '#e5e7eb' : '#242d3a';
+    el('#themeToggle').textContent = t==='dark' ? 'Dark' : 'Light';
+  };
+
+  // Keep numbers in a pseudo-USD space to simplify conversion demo
+  const asUSD = (v) => v / (state.currency==='USD'?1:(FX[state.currency]/FX['USD']));
+
+  // ===== Derived metrics =====
+  function totals() {
+    let invested = 0, current = 0;
+    state.stocks.forEach(s => {
+      invested += s.buy * s.qty;
+      current  += s.current * s.qty;
+    });
+    return { invested, current, pl: current - invested, plp: invested? ((current-invested)/invested*100):0 };
+  }
+
+  // ===== Rendering =====
+  function renderKPIs(){
+    const t = totals();
+    el('#kpi-invested').textContent = fmt(t.invested);
+    el('#kpi-current').textContent  = fmt(t.current);
+    el('#kpi-pl').textContent       = (t.pl>=0?'+':'') + fmt(Math.abs(t.pl)).replace(/^.[^0-9]/,'');
+    el('#kpi-pl').className = 'text-2xl font-semibold mt-1 ' + (t.pl>=0? 'text-success':'text-danger');
+    el('#kpi-plp').textContent = `${t.plp>=0?'+':''}${t.plp.toFixed(2)}%`;
+    el('#kpi-plp').className = 'text-2xl font-semibold mt-1 ' + (t.plp>=0? 'text-success':'text-danger');
+  }
+
+  function renderSparkline(){
+    // Create 7-point spark from current value +/- noise
+    const { current } = totals();
+    const pts = Array.from({length:7}, (_,i)=> current*(0.96 + Math.sin(i)*0.01 + Math.random()*0.02));
+    const max = Math.max(...pts), min = Math.min(...pts);
+    const scaleX = (i)=> 10 + i*(280/6);
+    const scaleY = (v)=> 50 - ((v-min)/(max-min||1))*40;
+    const d = pts.map((p,i)=> `${i===0?'M':'L'} ${scaleX(i)} ${scaleY(p)}`).join(' ');
+    const fill = `${d} L 290 60 L 10 60 Z`;
+    const sparkPath = el('#sparkPath');
+    const sparkFill = el('#sparkFill');
+    if (sparkPath && sparkFill) {
+      sparkPath.setAttribute('d', d);
+      sparkFill.setAttribute('d', fill);
+    }
+  }
+
+  function renderStocks(){
+    const tbody = el('#stocksTbody');
+    tbody.innerHTML = '';
+    state.stocks.forEach((s,idx)=>{
+      const pl = (s.current - s.buy) * s.qty;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="p-3 font-medium">${s.symbol}</td>
+        <td class="p-3 text-gray-600">${s.company}</td>
+        <td class="p-3 text-right">${s.qty}</td>
+        <td class="p-3 text-right">${fmt(s.buy)}</td>
+        <td class="p-3 text-right">${fmt(s.current)}</td>
+        <td class="p-3 text-right ${pl>=0?'text-success':'text-danger'}">${pl>=0?'+':''}${fmt(Math.abs(pl)).replace(/^.[^0-9]/,'')}</td>
+        <td class="p-3 text-right">
+          <button data-edit="${idx}" class="px-3 py-1.5 text-xs rounded-lg border mr-2 hover:bg-gray-50">Edit</button>
+          <button data-del="${idx}" class="px-3 py-1.5 text-xs rounded-lg border hover:bg-gray-50">Delete</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function renderTx(){
+    const tbody = el('#txTbody');
+    tbody.innerHTML = '';
+    state.transactions.forEach(tx=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="p-3">${tx.date}</td>
+        <td class="p-3">${tx.symbol}</td>
+        <td class="p-3">${tx.type}</td>
+        <td class="p-3 text-right">${tx.qty}</td>
+        <td class="p-3 text-right">${fmt(tx.price)}</td>
+        <td class="p-3 text-right">${fmt(tx.total)}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function renderAll(){
+  renderKPIs();
+  renderSparkline();
+  renderStocks();
+  renderTx();
+  // Update info blocks in prediction section with correct currency
+  const t = totals();
+  el('#info-invested').textContent = fmt(t.invested);
+  // For demo, use current as predicted value
+  el('#info-predicted').textContent = fmt(t.current);
+  el('#info-accuracy').textContent = '—'; // Placeholder, update with real accuracy if available
+  el('#info-other').textContent = '—'; // Placeholder, update with other details if available
+  save();
+  }
+
+  // ===== Navigation =====
+  function showSection(id){
+    ['overview','mystocks','transactions','settings'].forEach(key=>{
+      const sec = el('#section-'+key);
+      if (!sec) return;
+      if (key === id) {
+        sec.classList.remove('hidden');
+        sec.style.opacity = 1;
+        sec.style.transform = 'none';
+      } else {
+        sec.classList.add('hidden');
+      }
+    });
+    els('.nav-item').forEach(a=>{
+      a.classList.toggle('bg-white', a.dataset.nav===id);
+      a.classList.toggle('shadow', a.dataset.nav===id);
+    });
+  }
+
+  els('.nav-item').forEach(a=> a.addEventListener('click', ()=> showSection(a.dataset.nav)));
+
+  // ===== Modal =====
+  const openModal = () => { el('#stockModal').classList.remove('hidden'); };
+  const closeModal = () => { el('#stockModal').classList.add('hidden'); el('#stockForm').reset(); el('#editingIndex').value=''; el('#modalTitle').textContent='Add Stock'; };
+
+  el('#openAddModal').addEventListener('click', openModal);
+  el('#closeModal').addEventListener('click', closeModal);
+  el('#cancelModal').addEventListener('click', closeModal);
+
+  el('#stocksTbody').addEventListener('click', (e)=>{
+    const edit = e.target.closest('button[data-edit]');
+    const del  = e.target.closest('button[data-del]');
+    if (edit){
+      const idx = +edit.dataset.edit;
+      const s = state.stocks[idx];
+      el('#modalTitle').textContent='Edit Stock';
+      el('#fSymbol').value = s.symbol;
+      el('#fCompany').value = s.company;
+      el('#fQty').value = s.qty;
+      el('#fBuy').value = s.buy;
+      el('#fCurrent').value = s.current;
+      el('#fDate').value = s.date;
+      el('#editingIndex').value = idx;
+      openModal();
+    }
+    if (del){
+      const idx = +del.dataset.del;
+      const s = state.stocks[idx];
+      state.transactions.push({ date: new Date().toISOString().slice(0,10), symbol:s.symbol, type:'DELETE', qty:s.qty, price:s.buy, total:s.buy*s.qty });
+      state.stocks.splice(idx,1);
+      renderAll();
+    }
+  });
+
+  el('#stockForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const sym = el('#fSymbol').value.trim().toUpperCase();
+    const com = el('#fCompany').value.trim();
+    const qty = +el('#fQty').value;
+    const buy = +el('#fBuy').value;
+    const cur = +el('#fCurrent').value;
+    const dat = el('#fDate').value;
+    const idx = el('#editingIndex').value;
+
+    if (idx!==""){
+      const before = structuredClone(state.stocks[idx]);
+      state.stocks[idx] = { symbol:sym, company:com, qty, buy, current:cur, date:dat };
+      state.transactions.push({ date:new Date().toISOString().slice(0,10), symbol:sym, type:'EDIT', qty: qty-before.qty, price: buy, total: (qty*buy) });
+    } else {
+      state.stocks.push({ symbol:sym, company:com, qty, buy, current:cur, date:dat });
+      state.transactions.push({ date:dat, symbol:sym, type:'BUY', qty, price: buy, total: qty*buy });
+    }
+    closeModal();
+    renderAll();
+    showSection('mystocks');
+  });
+
+  el('#clearAllBtn').addEventListener('click', ()=>{
+    if (confirm('Clear all stocks?')){
+      state.transactions.push({ date:new Date().toISOString().slice(0,10), symbol:'*', type:'CLEAR', qty:0, price:0, total:0 });
+      state.stocks = [];
+      renderAll();
+    }
+  });
+
+  // ===== Prices mock update =====
+  el('#refreshPrices').addEventListener('click', ()=>{
+    state.stocks = state.stocks.map(s=> ({...s, current: +(s.current * (0.98 + Math.random()*0.06)).toFixed(2) }));
+    renderAll();
+  });
+
+  // ===== Currency handling =====
+  function setCurrency(ccy){ state.currency = ccy; save(); renderAll(); }
+  ['#currencySelect','#currencySelect2'].forEach(id=>{
+    const sel = el(id); if(!sel) return; sel.value = state.currency; sel.addEventListener('change', ()=> setCurrency(sel.value));
+  });
+
+  // ===== Theme handling =====
+  el('#themeToggle').addEventListener('click', ()=> setTheme(state.theme==='light'?'dark':'light'));
+  el('#themeToggle2').addEventListener('click', ()=> setTheme(state.theme==='light'?'dark':'light'));
+
+  // ===== Mock Stock Database =====
+  const MOCK_STOCKS = {
+    'AAPL': { company: 'Apple Inc.', exchange: 'NASDAQ', currency: 'USD', sector: 'Technology', currentPrice: 175.20 },
+    'TSLA': { company: 'Tesla Inc.', exchange: 'NASDAQ', currency: 'USD', sector: 'Automotive', currentPrice: 248.50 },
+    'GOOGL': { company: 'Alphabet Inc.', exchange: 'NASDAQ', currency: 'USD', sector: 'Technology', currentPrice: 142.80 },
+    'MSFT': { company: 'Microsoft Corporation', exchange: 'NASDAQ', currency: 'USD', sector: 'Technology', currentPrice: 378.90 },
+    'RELIANCE.NS': { company: 'Reliance Industries Ltd', exchange: 'NSE', currency: 'INR', sector: 'Oil & Gas', currentPrice: 2450.75 },
+    'INFY.NS': { company: 'Infosys Limited', exchange: 'NSE', currency: 'INR', sector: 'Information Technology', currentPrice: 1585.30 },
+    'TCS.NS': { company: 'Tata Consultancy Services', exchange: 'NSE', currency: 'INR', sector: 'Information Technology', currentPrice: 3890.50 },
+    'HDFCBANK.NS': { company: 'HDFC Bank Limited', exchange: 'NSE', currency: 'INR', sector: 'Financial Services', currentPrice: 1678.25 },
+    'VOD.L': { company: 'Vodafone Group Plc', exchange: 'LSE', currency: 'GBP', sector: 'Telecommunications', currentPrice: 0.72 },
+    'BP.L': { company: 'BP Plc', exchange: 'LSE', currency: 'GBP', sector: 'Oil & Gas', currentPrice: 4.85 }
+  };
+
+  el('#lookupBtn').addEventListener('click', function() {
+    let symbol = el('#fSymbol').value.trim().toUpperCase();
+    let company = el('#fCompanyInput').value.trim();
+    if (symbol) {
+      // Direct symbol lookup
+      fetch(`/fetch_stock_details?symbol=${encodeURIComponent(symbol)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            el('#fCompany').value = '';
+            el('#fExchange').value = '';
+            el('#fCurrency').value = '';
+            el('#fSector').value = '';
+            el('#fCurrent').value = '';
+            el('#lookupStatus').textContent = 'Not found.';
+            el('#lookupStatus').className = 'text-sm text-danger';
+          } else {
+            el('#fCompany').value = data.longName || '';
+            el('#fExchange').value = data.exchange || '';
+            el('#fCurrency').value = data.currency || '';
+            el('#fSector').value = data.sector || '';
+            el('#lookupStatus').textContent = 'Details fetched!';
+            el('#lookupStatus').className = 'text-sm text-success';
+          }
+        })
+        .catch(() => {
+          el('#fCompany').value = '';
+          el('#fExchange').value = '';
+          el('#fCurrency').value = '';
+          el('#fSector').value = '';
+          el('#fCurrent').value = '';
+          el('#lookupStatus').textContent = 'Error fetching.';
+          el('#lookupStatus').className = 'text-sm text-danger';
+        });
+    } else if (company) {
+      // Search by company name
+      el('#lookupStatus').textContent = 'Searching...';
+      el('#lookupStatus').className = 'text-sm text-brand-blue';
+      fetch(`/search_company?company=${encodeURIComponent(company)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error || !data.results.length) {
+            el('#lookupStatus').textContent = 'No matches found.';
+            el('#lookupStatus').className = 'text-sm text-danger';
+            el('#symbolDropdown')?.remove();
+          } else {
+            // Create dropdown for user to select symbol
+            let dropdown = document.getElementById('symbolDropdown');
+            if (dropdown) dropdown.remove();
+            // Create label for dropdown
+            const label = document.createElement('label');
+            label.textContent = 'Select Symbol from available options:';
+            label.className = 'text-sm text-gray-600 mt-2';
+            // Create dropdown
+            dropdown = document.createElement('select');
+            dropdown.id = 'symbolDropdown';
+            dropdown.className = 'mt-1 w-full border border-gray-200 rounded-lg px-3 py-2';
+            data.results.forEach(item => {
+              const option = document.createElement('option');
+              option.value = item.symbol;
+              // Format: Symbol | Name | Exchange | Currency
+              option.textContent = `${item.symbol} | ${item.shortname || ''} | ${item.exchange || ''}`;
+              // option.textContent = `${item.symbol} | ${item.shortname || ''} | ${item.exchange || ''} | ${item.currency || ''}`;
+              dropdown.appendChild(option);
+            });
+            // Insert label and dropdown after fSymbol input
+            const parent = el('#fSymbol').parentNode;
+            parent.appendChild(label);
+            parent.appendChild(dropdown);
+            el('#lookupStatus').textContent = 'Select a symbol.';
+            el('#lookupStatus').className = 'text-sm text-success';
+            dropdown.onchange = function() {
+              el('#fSymbol').value = this.value;
+              // Auto-fetch details for selected symbol
+              el('#lookupBtn').click();
+              label.remove();
+              dropdown.remove();
+            };
+          }
+        })
+        .catch(() => {
+          el('#lookupStatus').textContent = 'Error searching.';
+          el('#lookupStatus').className = 'text-sm text-danger';
+          el('#symbolDropdown')?.remove();
+        });
+    } else {
+      el('#lookupStatus').textContent = 'Enter symbol or company name.';
+      el('#lookupStatus').className = 'text-sm text-danger';
+    }
+  });
+
+  // ===== Init =====
+  (function init(){
+    document.getElementById('year').textContent = new Date().getFullYear();
+    setTheme(state.theme);
+    showSection('overview');
+    renderAll();
+  })();
+</script>
+</body>
+</html>

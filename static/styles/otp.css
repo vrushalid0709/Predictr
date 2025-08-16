@@ -1,0 +1,141 @@
+ 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: #f4f7f6;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Header Styling */
+    .main-header {
+      max-width: 1100px;
+      margin: 0 auto 40px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    
+     .logo img {
+            height: 20px; 
+            width: auto;
+            display: block; 
+        }
+
+    .go-home {
+      color: #333;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      font-size: 15px;
+    }
+
+    .go-home:hover {
+      color: #00a86b;
+    }
+
+    /* OTP Container */
+    .otp-container {
+      max-width: 480px;
+      background-color: white;
+      padding: 48px 40px;
+      border-radius: 16px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      margin: 0 auto;
+    }
+
+    h2 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    p.instructions {
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .otp-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .otp-input {
+      width: 48px;
+      height: 48px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .otp-input:focus {
+      border-color: #00a86b;
+      box-shadow: 0 0 0 3px rgba(0, 168, 107, 0.1);
+      outline: none;
+    }
+
+    .verify-btn {
+      background-color: #00a86b;
+      color: white;
+      border: none;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      width: 100%;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .verify-btn:hover {
+      background-color: #008f5c;
+    }
+
+    .resend-link {
+      margin-top: 24px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .resend-link a {
+      color: #00a86b;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .resend-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .otp-container {
+        padding: 32px 24px;
+      }
+
+      .otp-input {
+        width: 40px;
+        height: 40px;
+      }
+    }

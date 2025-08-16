@@ -99,26 +99,29 @@
     <nav class="fixed top-0 w-full bg-white/95 backdrop-blur-sm border-b border-gray-100 z-50">
         <div style="width:100%;padding:0;margin:0;">
             <div class="flex justify-between items-center h-16" style="padding-left:0;margin:0;">
-                <div class="flex items-center space-x-0" style="margin-left:2rem;">
-                    <div class="w-8 h-8 bg-brand-blue rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
-                        </svg>
-                    </div>
-                    <span class="text-xl font-semibold text-brand-navy">Predictr</span>
+                <div class="flex items-center space-x-0" style="margin-left:5rem;">
+                   <!-- Logo -->
+                <a href="/" class="logo flex items-center">
+                    <img
+                        src="{{ url_for('static', filename='assets/logo_file/png/predictr-high-resolution-logo-transparent.png') }}"
+                        alt="Predictr logo"
+                        class="h-5 w-auto"
+                    />
+                </a>
+                    
                 </div>
                 
                 <div class="hidden md:flex items-center space-x-8">
                     <div style="position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;max-width:420px;display:flex;justify-content:center;align-items:center;gap:2.5rem;height:100%;">
                         <a href="#features" class="text-gray-600 hover:text-brand-blue transition-colors px-3 py-1 rounded-md">Features</a>
                         <!-- <a href="#how-it-works" class="text-gray-600 hover:text-brand-blue transition-colors px-3 py-1 rounded-md">How it works</a> -->
-                        <a href="public-pages/contact.html" class="text-gray-600 hover:text-brand-blue transition-colors px-3 py-1 rounded-md">Contact Us</a>
+                        <a href="/contact" class="text-gray-600 hover:text-brand-blue transition-colors px-3 py-1 rounded-md">Contact Us</a>
                     </div>
                 </div>
                 
                 <div class="flex items-center space-x-4" style="margin-right:4rem; margin-left:1rem;">
     <!-- Login Button Link -->
-    <a href="./public-pages/log-in.html">
+    <a href="/login-page">
         <button
             class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium shadow-lg hover:bg-[#b2e0d4]"
         >
@@ -127,7 +130,7 @@
     </a>
 
     <!-- Get Started Button Link (assuming it goes to the sign-up page) -->
-    <a href="./public-pages/sign-up.html">
+    <a href="/signup-page">
         <button
             class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium shadow-lg hover:bg-[#b2e0d4]"
         >

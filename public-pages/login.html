@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Predictr</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+ <!-- Header Section -->
+<header class="main-header">
+    <a href="/" class="logo">
+       <img 
+       src="{{ url_for('static', filename='assets/logo_file/png/predictr-high-resolution-logo-transparent.png') }}"
+       height="36px"
+       alt="Predictr logo"
+       />
+    </a>
+    <a href="/" class="go-home">Go back home &rarr;</a>
+</header>
+
+<!-- Main Sign In Container -->
+<div class="container">
+    <div class="signup-box">
+
+        <!-- Left Panel with Sign In Form -->
+        <div class="left-panel">
+            <h2>Log in. Stay ahead.</h2>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <!-- Corrected Form -->
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                <div class="form-group">
+                    <label for="email-input" class="form-label">Email Address</label>
+                    <input type="email" id="email-input" name="email" class="form-input" placeholder="Enter Your Email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password-input" class="form-label">Password</label>
+                    <input type="password" id="password-input" name="password" class="form-input" placeholder="Enter your password" required>
+                </div>
+
+                <button class="signup-btn" type="submit">Log In</button>
+            </form>
+
+            <p class="login-link">
+                New to Predictr?
+                <a href="/signup-page" class="toggle-btn">Create an account</a>
+            </p>
+
+            <p class="terms">
+                By logging in, you agree to Predictr's
+                <a href="#terms">Terms of Service</a> and
+                <a href="#privacy">Privacy Policy</a>.
+            </p>
+        </div>
+
+        <!-- Right Panel with Branded Content -->
+        <div class="right-panel">
+            <h2>Welcome back.</h2>
+            <p>
+                Let’s get you closer to your goals.<br />
+                Log in to track your spending, set smarter budgets, and see your future — powered by AI.
+            </p>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

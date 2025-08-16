@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify Account - Predictr</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/otp.css') }}">
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header class="main-header">
+    <a href="/" class="logo">
+      <img
+        src="{{ url_for('static', filename='assets/logo_file/png/predictr-high-resolution-logo-transparent.png') }}"
+        height="36px"
+        alt="Predictr logo"
+      />
+    </a>
+    <a href="/" class="go-home">← Back to Home</a>
+  </header>
+
+  <!-- OTP Box -->
+  <div class="otp-container">
+    <h2>Check your email</h2>
+    <p class="instructions">
+      We've sent a six-digit code to your email address.<br />
+      Please enter it below to verify your account.
+    </p>
+
+    <!-- OTP Form -->
+    <form class="otp-form" method="POST" action="{{ url_for('otp.verify') }}">
+      <div class="otp-inputs">
+        {% for i in range(6) %}
+          <input type="text" class="otp-input" name="otp_digit{{ i }}" inputmode="numeric" maxlength="1" pattern="[0-9]" required>
+        {% endfor %}
+      </div>
+      <button type="submit" class="verify-btn">Verify Account</button>
+    </form>
+
+    <p class="resend-link">Didn't receive the code? <a href="#">Resend OTP</a></p>
+  </div>
+
+  <!-- Script for OTP Focus Control -->
+  <script>
+    const otpInputs = document.querySelectorAll('.otp-input');
+
+    document.querySelector('.otp-form').addEventListener('input', (e) => {
+      const target = e.target;
+      if (target.value.length === 1 && target.nextElementSibling) {
+        target.nextElementSibling.focus();
+      }
+    });
+
+    document.querySelector('.otp-form').addEventListener('keydown', (e) => {
+      const target = e.target;
+      if (e.key === 'Backspace' && target.value === '' && target.previousElementSibling) {
+        target.previousElementSibling.focus();
+      }
+    });
+
+    otpInputs[0].addEventListener('paste', (e) => {
+      e.preventDefault();
+      const data = e.clipboardData.getData('text').trim().slice(0, 6);
+      [...data].forEach((digit, index) => {
+        if (otpInputs[index]) otpInputs[index].value = digit;
+      });
+      otpInputs[Math.min(data.length, 5)].focus();
+    });
+  </script>
+
+</body>
+</html>
