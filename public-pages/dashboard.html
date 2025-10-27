@@ -6,17 +6,19 @@
   <title>Predictr — User Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'brand-blue': '#387ef5',
-            'brand-navy': '#242d3a',
-            'brand-light': '#f8fafd',
-            'success': '#00c851',
-            'warning': '#ff9f43',
-            'danger': '#ee5a52',
-            'muted': '#9eb3c2'
+    tailwind = {
+      config: {
+        theme: {
+          extend: {
+            colors: {
+              'brand-blue': '#387ef5',
+              'brand-navy': '#242d3a',
+              'brand-light': '#f8fafd',
+              'success': '#00c851',
+              'warning': '#ff9f43',
+              'danger': '#ee5a52',
+              'muted': '#9eb3c2'
+            }
           }
         }
       }
@@ -31,7 +33,7 @@
     .gradient-text { background: linear-gradient(45deg,#387ef5,#00c851); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
   </style>
 </head>
-<body class="bg-white text-brand-navy antialiased">
+<body class="bg-white text-brand-navy antialiased" data-userid="{{ user_id }}">
 
   <!-- Top Nav -->
   <nav class="fixed top-0 inset-x-0 bg-white/95  border-gray-100 backdrop-blur z-50">
@@ -58,9 +60,9 @@
           <!--Theme Toggle-->
           <!-- <button id="themeToggle" class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm hover:bg-gray-50">Light</button> -->
           <div class="flex items-center gap-2">
-            <img src="{{ url_for('static', filename='assets/elements/user.png') }}" class="w-8 h-8 rounded-full" alt="avatar"/>
-            <span class="hidden sm:block text-sm font-medium">Hi, Alex</span>
-          </div>
+          <img src="{{ url_for('static', filename='assets/elements/user.png') }}" class="w-8 h-8 rounded-full" alt="avatar"/>
+         <span class="hidden sm:block text-sm font-medium">Hi, {{ user_name }}</span>
+         </div>
         </div>
       </div>
     </div>
@@ -124,14 +126,13 @@
         </div> -->
 
         <!-- Search Bar for Stocks -->
-<div class="bg-white border border-gray-100 rounded-2xl p-5 mt-6 flex items-center gap-3">
+<div class="relative bg-white border border-gray-100 rounded-2xl p-5 mt-6 flex items-center gap-3">
   <input id="stockSearchInput" type="text" class="border border-gray-200 rounded-lg px-4 py-2 w-full" placeholder="Search your stocks by symbol or name..." />
   <button id="stockSearchBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Search</button>
 </div>
 
-<!-- Prediction Graph and Info Blocks -->
 <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mt-6">
-  <!-- Graph (Prediction) -->
+
   <div class="col-span-2 bg-white border border-gray-100 rounded-2xl p-5 flex flex-col">
     <div class="flex items-center justify-between mb-2">
       <div class="font-semibold">Stock Prediction Graph</div>
@@ -146,12 +147,11 @@
       </div>
     </div>
     <div class="flex-1 flex items-center justify-center">
-      <!-- Placeholder for prediction graph -->
       <canvas id="predictionGraph" class="w-full h-48"></canvas>
     </div>
     <div class="mt-2 text-xs text-gray-500">Scroll or select range to view predictions for next n days/months/years.</div>
   </div>
-  <!-- Info Blocks -->
+
   <div class="col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
     <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
       <div class="text-sm text-gray-500">Amount Invested</div>
@@ -170,6 +170,16 @@
       <div id="info-other" class="text-xl font-semibold mt-1">All positions stable</div>
     </div>
   </div>
+
+  <div id="search-actions" class="col-span-3 md:col-span-5 mt-4">
+      <button id="prepareAddStockBtn" class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg w-full card-hover">
+        Add This Stock to My Portfolio
+      </button>
+      <button id="saveStockBtn" class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg w-full card-hover">
+      Quick Save
+    </button>
+  </div>
+  
 </div>
       </section>
 
@@ -668,10 +678,270 @@
   // ===== Init =====
   (function init(){
     document.getElementById('year').textContent = new Date().getFullYear();
-    setTheme(state.theme);
+    // setTheme(state.theme);
     showSection('overview');
     renderAll();
   })();
+   // Safe helper name (replaces el)
+  const qs = (selector) => document.querySelector(selector);
+
+  // Find the search bar element
+  const searchInput = qs('#stockSearchInput');
+  if (searchInput) {
+    // Create suggestion container
+    const suggestionBox = document.createElement('div');
+    suggestionBox.id = 'searchSuggestions';
+    suggestionBox.className =
+      'absolute bg-white border border-gray-200 rounded-lg shadow-md mt-2 w-full z-50 hidden';
+    searchInput.parentNode.appendChild(suggestionBox);
+
+    // Detect typing in search bar
+    searchInput.addEventListener('input', async (e) => {
+      const query = e.target.value.trim();
+      if (query.length < 2) {
+        suggestionBox.classList.add('hidden');
+        return;
+      }
+
+      try {
+        // Fetch matching stocks from backend
+        const res = await fetch(`/api/search_company?company=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        if (!data.results || !data.results.length) {
+          suggestionBox.innerHTML =
+            `<div class="px-4 py-2 text-gray-500 text-sm">No matches found</div>`;
+          suggestionBox.classList.remove('hidden');
+          return;
+        }
+
+        // Build clickable list of suggestions with Save button
+suggestionBox.innerHTML = data.results
+  .map(
+    (r) => `
+      <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-100 text-sm border-b last:border-0">
+        <div class="cursor-pointer flex-1" data-symbol="${r.symbol}">
+          ${r.symbol} | ${r.shortname || ''} | ${r.exchange || ''}
+        </div>
+        <button 
+          class="save-btn text-brand-blue text-xs font-medium border border-brand-blue rounded px-2 py-1 hover:bg-brand-blue hover:text-white transition"
+          data-save-symbol="${r.symbol}">
+          Save
+        </button>
+      </div>`
+  )
+  .join('');
+        suggestionBox.classList.remove('hidden');
+      } catch (error) {
+        console.error('Error fetching stock list:', error);
+      }
+    });
+
+    // Handle clicks on suggestions or Save buttons
+suggestionBox.addEventListener('click', (e) => {
+  const saveBtn = e.target.closest('[data-save-symbol]');
+  const stockItem = e.target.closest('[data-symbol]');
+
+  // If Save button clicked
+  if (saveBtn) {
+    const symbol = saveBtn.dataset.saveSymbol;
+    suggestionBox.classList.add('hidden');
+
+    // Switch to "My Stocks" section
+    showSection('mystocks');
+
+    // Open modal with symbol pre-filled
+    openModal();
+    el('#fSymbol').value = symbol;
+    el('#lookupBtn').click();
+    return;
+  }
+
+  // If stock name clicked
+  if (stockItem) {
+    const symbol = stockItem.dataset.symbol;
+    searchInput.value = symbol;
+    suggestionBox.classList.add('hidden');
+    qs('#stockSearchBtn').click();
+  }
+});
+  }
+
+  // ===== Search Button Click Handler =====
+  const searchBtn = qs('#stockSearchBtn');
+  if (searchBtn) {
+    searchBtn.addEventListener('click', () => {
+      const query = qs('#stockSearchInput').value.trim().toUpperCase();
+      if (!query) return;
+
+      // Hide the action button and suggestion box on every new search
+      qs('#search-actions').classList.add('hidden');
+      const suggestionBox = qs('#searchSuggestions');
+      if (suggestionBox) suggestionBox.classList.add('hidden');
+
+      // Fetch the stock details from your backend API
+      fetch(`/api/fetch_stock_details?symbol=${encodeURIComponent(query)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const infoOther = qs('#info-other');
+          const infoInvested = qs('#info-invested');
+          const infoPredicted = qs('#info-predicted');
+
+          if (data.error) {
+            infoOther.textContent = 'Stock not found.';
+            infoInvested.textContent = '—';
+            infoPredicted.textContent = '—';
+          } else {
+            // Update the blocks 
+            infoOther.textContent = `${data.longName || 'N/A'}`;
+            infoInvested.textContent = fmt(data.currentPrice || 0); 
+            infoPredicted.textContent = 'Calculating...'; 
+            // add stock button 
+            const prepareBtn = qs('#prepareAddStockBtn');
+            prepareBtn.dataset.symbol = data.symbol; 
+            qs('#search-actions').classList.remove('hidden'); 
+          }
+        })
+        .catch((err) => {
+            console.error('Error fetching details:', err);
+            qs('#info-other').textContent = 'Error during search.';
+        });
+    });
+  }
+
+  // ===== Action Button to Open the Add Stock Modal =====
+  const prepareBtn = qs('#prepareAddStockBtn');
+  if (prepareBtn) {
+    prepareBtn.addEventListener('click', function() {
+      const symbol = this.dataset.symbol; // Get the symbol we stored earlier
+      if (!symbol) return;
+
+      //switching section to "My Stocks"
+      showSection('mystocks');
+
+      //Open the "Add Stock" modal 
+      openModal();
+
+      //Pre-fill the stock symbol 
+      el('#fSymbol').value = symbol;
+
+      //Automatically click the "Fetch Details" button 
+      el('#lookupBtn').click();
+    });
+  }
+
+  // ===== Fetch and Display My Stocks =====
+async function loadMyStocks() {
+  const userId = document.body.dataset.userid;
+  if (!userId) return;
+
+  try {
+    const res = await fetch(`/api/stocks/get_stocks?user_id=${userId}`); 
+    const data = await res.json();
+
+    const container = document.getElementById("myStocksList");
+    if (!container) return;
+
+    if (!data.stocks || data.stocks.length === 0) {
+      container.innerHTML = `<p class="text-gray-500 text-sm">No saved stocks yet.</p>`;
+      return;
+    }
+
+    container.innerHTML = data.stocks
+      .map(
+        (s) => `
+        <div class="p-3 border border-gray-200 rounded-lg shadow-sm bg-white flex justify-between items-center">
+          <div>
+            <p class="font-semibold">${s.symbol}</p>
+            <p class="text-sm text-gray-600">${s.longName} (${s.exchange})</p>
+          </div>
+          <button class="text-red-500 text-sm" onclick="removeStock('${s.symbol}')">Remove</button>
+        </div>`
+      )
+      .join("");
+  } catch (error) {
+    console.error("Error loading stocks:", error);
+  }
+}
+
+// Load saved stocks when page opens
+document.addEventListener("DOMContentLoaded", loadMyStocks);
+
+  // ===== Save Stock to MongoDB =====
+const saveBtn = document.getElementById("saveStockBtn");
+if (saveBtn) {
+  saveBtn.addEventListener("click", async () => {
+    const symbol = document.getElementById("stockSearchInput").value.trim();
+    const infoText = document.getElementById("info-other")?.textContent || "";
+
+    if (!symbol) {
+      alert("Please search and select a stock first!");
+      return;
+    }
+
+    // Extract stock info
+    const [longName, exchangeRaw] = infoText.split("(");
+    const exchange = exchangeRaw ? exchangeRaw.replace(")", "").trim() : "—";
+    const userId = document.body.dataset.userid;
+
+    const stockData = {
+      user_id: userId,
+      symbol: symbol,
+      longName: longName?.trim() || symbol,
+      exchange: exchange,
+    };
+
+    try {
+      const res = await fetch("/api/stocks/add_stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(stockData),
+      });
+
+      const data = await res.json();
+      if (data.message) {
+        alert("✅ Stock saved successfully!");
+        loadMyStocks(); // refresh stocks display
+      } else {
+        alert("⚠️ " + (data.error || "Something went wrong."));
+      }
+    } catch (error) {
+      console.error("Error saving stock:", error);
+      alert("⚠️ Could not connect to server.");
+    }
+  });
+}
+// ===== Remove a Stock =====
+async function removeStock(symbol) {
+  if (!confirm(`Are you sure you want to remove ${symbol}?`)) {
+    return;
+  }
+
+  const userId = document.body.dataset.userid;
+  if (!userId) {
+    alert("Could not identify user.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/stocks/remove_stock", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: userId, symbol: symbol }),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert(" Stock removed successfully!");
+      loadMyStocks(); // Refresh the list from the backend
+    } else {
+      alert(" !! " + (data.error || "Something went wrong."));
+    }
+  } catch (error) {
+    console.error("Error removing stock:", error);
+    alert("Could not connect to the server.");
+  }
+}
 </script>
 </body>
 </html>

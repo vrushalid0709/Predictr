@@ -75,7 +75,15 @@ def dashboard():
     if 'user' not in session:
         flash("Please log in first", "warning")
         return redirect(url_for('auth.login'))
-    return render_template('dashboard.html', user=session['user'])
+    
+    # 1. Fetch user from db
+    user_email = session['user']
+    user_data = users_collection.find_one({"email": user_email})
+
+    # 2. Alternative when name not found
+    user_name = user_data.get('name', 'User') if user_data else 'User'
+    return render_template('dashboard.html', user_name=user_name)
+
 
 # LOGOUT
 @auth.route('/logout')

@@ -4,6 +4,8 @@ import os
 from flask import Blueprint
 from backend_process.extensions import mail
 from backend_process.routes.FetchStock import fetch_stock
+from backend_process.routes.StockRoutes import stock_routes
+
 
 load_dotenv()
 
@@ -31,6 +33,7 @@ from backend_process.routes.otp_routes import otp
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(otp, url_prefix='/otp')
 app.register_blueprint(fetch_stock, url_prefix='/api')
+app.register_blueprint(stock_routes, url_prefix="/api")
 
 # page routes to frontend 
 @app.route('/')
