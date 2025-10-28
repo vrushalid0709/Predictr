@@ -1,6 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 import random
+import sys
+import os
+# Add the project root to Python path
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
 from backend_process.utils.email_utils import send_otp_email
+from backend_process.utils.user_helpers import user_helper
 from db_connection.db import db
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
@@ -21,8 +29,9 @@ def login():
         if user:
             # Verify the hashed password
             if check_password_hash(user['password'], password_input):
-                # Password is correct
+                # Password is correct - store both email and user_id in session
                 session['user'] = email
+                session['user_id'] = str(user['_id'])  # Store user_id for stock operations
                 flash("Logged in successfully!", "success")
                 return redirect(url_for('auth.dashboard'))
             else:
@@ -76,18 +85,23 @@ def dashboard():
         flash("Please log in first", "warning")
         return redirect(url_for('auth.login'))
     
-    # 1. Fetch user from db
-    user_email = session['user']
-    user_data = users_collection.find_one({"email": user_email})
-
-    # 2. Alternative when name not found
-    user_name = user_data.get('name', 'User') if user_data else 'User'
-    return render_template('dashboard.html', user_name=user_name)
+    # Validate user session and get user info
+    user_info = user_helper.validate_user_session(session)
+    
+    if not user_info['valid']:
+        flash("Session invalid. Please log in again.", "warning")
+        return redirect(url_for('auth.login'))
+    
+    # Pass both user_name and user_id to the template
+    return render_template('dashboard.html', 
+                         user_name=user_info['name'], 
+                         user_id=user_info['user_id'])
 
 
 # LOGOUT
 @auth.route('/logout')
 def logout():
     session.pop('user', None)
+    session.pop('user_id', None)  # Also clear user_id
     flash("Logged out successfully!", "success")
     return redirect(url_for('auth.login'))

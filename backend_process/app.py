@@ -1,7 +1,14 @@
 from flask import Flask, render_template
 from dotenv import load_dotenv
 import os
+import sys
 from flask import Blueprint
+
+# Add the project root to Python path
+project_root = os.path.dirname(os.path.dirname(__file__))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
 from backend_process.extensions import mail
 from backend_process.routes.FetchStock import fetch_stock
 from backend_process.routes.StockRoutes import stock_routes
@@ -52,7 +59,24 @@ def login_page():
 dashboard = Blueprint('dashboard', __name__)
 @dashboard.route('/view')
 def view():
-    return render_template('dashboard.html')
+    from flask import session, redirect, url_for, flash
+    # Check if user is logged in
+    if 'user' not in session:
+        flash("Please log in first", "warning")
+        return redirect(url_for('auth.login'))
+    
+    # Validate user session and get user info
+    from backend_process.utils.user_helpers import user_helper
+    user_info = user_helper.validate_user_session(session)
+    
+    if not user_info['valid']:
+        flash("Session invalid. Please log in again.", "warning")
+        return redirect(url_for('auth.login'))
+    
+    # Pass both user_name and user_id to the template
+    return render_template('dashboard.html', 
+                         user_name=user_info['name'], 
+                         user_id=user_info['user_id'])
 app.register_blueprint(dashboard, url_prefix='/dashboard')
 
 @app.route("/contact")
