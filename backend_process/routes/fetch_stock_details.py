@@ -1,4 +1,4 @@
-
+# Vrushali Coded
 from flask import Blueprint, request, jsonify
 import yfinance as yf  # Yahoo Finance Python package 
 
