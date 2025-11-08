@@ -1,5 +1,7 @@
 #StockRoutes.py code
 from flask import Blueprint, request, jsonify, session
+from backend_process.train_model import train_lstm_model
+from backend_process.predict_stock import predict_stock_price
 from datetime import datetime
 from db_connection.db import db
 import sys
@@ -15,7 +17,7 @@ from backend_process.utils.user_helpers import user_helper
 
 stock_routes = Blueprint("stock_routes", __name__)
 
-print("✅ StockRoutes blueprint loaded successfully")
+print(" StockRoutes blueprint loaded successfully")
 
 
 # ===== Add a Stock =====
@@ -187,11 +189,11 @@ def get_stock_price():
             "timestamp": datetime.now().isoformat()
         }
         
-        print(f"📈 Fetched price for {symbol}: ${current_price}")
+        print(f"Fetched price for {symbol}: ${current_price}")
         return jsonify(stock_data), 200
         
     except Exception as e:
-        print(f"❌ Error fetching stock price: {str(e)}")
+        print(f" Error fetching stock price: {str(e)}")
         return jsonify({"error": f"Failed to fetch stock price: {str(e)}"}), 500
 
 
@@ -228,20 +230,20 @@ def get_exchange_rates():
             data = response.json()
             
             if data.get("result") == "success":
-                print("✅ Successfully fetched live exchange rates")
+                print("Successfully fetched live exchange rates")
                 return jsonify({
                     "rates": data.get("conversion_rates", {}),
                     "timestamp": data.get("time_last_update_utc"),
                     "source": "exchangerate-api.com"
                 }), 200
             else:
-                print(f"❌ ExchangeRate-API error: {data.get('error-type')}")
+                print(f"ExchangeRate-API error: {data.get('error-type')}")
                 raise Exception(f"API returned error: {data.get('error-type')}")
         else:
             raise Exception(f"HTTP {response.status_code}: {response.text}")
             
     except Exception as e:
-        print(f"❌ Error fetching exchange rates: {str(e)}")
+        print(f" Error fetching exchange rates: {str(e)}")
         # Return default rates on error
         return jsonify({
             "rates": {
@@ -254,3 +256,21 @@ def get_exchange_rates():
             "source": "default (error)",
             "error": str(e)
         }), 200  # Return 200 with default rates instead of error
+    
+# Train Model Route
+@stock_routes.route('/train/<symbol>', methods=['POST'])
+def train_stock_model(symbol):
+    try:
+        result = train_lstm_model(symbol.upper())
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+    
+# Predict Future Prices Route
+@stock_routes.route('/predict/<symbol>', methods=['GET'])
+def predict_stock(symbol):
+    try:
+        result = predict_stock_price(symbol.upper())
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
