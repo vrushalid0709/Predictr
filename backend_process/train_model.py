@@ -13,6 +13,11 @@ from tensorflow.keras.callbacks import EarlyStopping
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import json
+import warnings
+
+# Suppress TensorFlow warnings for cleaner output
+warnings.filterwarnings('ignore', category=UserWarning)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

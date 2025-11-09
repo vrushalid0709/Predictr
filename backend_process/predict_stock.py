@@ -8,6 +8,11 @@ from tensorflow.keras.models import load_model
 from dotenv import load_dotenv
 import json
 from pymongo import MongoClient
+import warnings
+
+# Suppress TensorFlow warnings for cleaner output
+warnings.filterwarnings('ignore', category=UserWarning)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 #  Load environment variables
 
@@ -34,7 +39,18 @@ def predict_stock_price(stock_symbol, days_to_predict=5):
     # Find model info in MongoDB
     record = collection.find_one({"stock_symbol": stock_symbol})
     if not record:
-        return {"status": "error", "message": "Model not found for this stock!"}
+        print(f"🤖 No existing model found for {stock_symbol}. Training new model...")
+        
+        # Auto-train the model
+        from backend_process.train_model import train_lstm_model
+        train_result = train_lstm_model(stock_symbol)
+        
+        if train_result.get("status") == "success":
+            print(f"✅ New model trained successfully for {stock_symbol}")
+            # Get the newly created record
+            record = collection.find_one({"stock_symbol": stock_symbol})
+        else:
+            return {"status": "error", "message": f"Failed to train new model for {stock_symbol}: {train_result.get('reason', 'Unknown error')}"}
 
     model_path = record["model_path"]
     
@@ -48,8 +64,25 @@ def predict_stock_price(stock_symbol, days_to_predict=5):
     if not os.path.exists(model_path):
         return {"status": "error", "message": f"Model file missing: {model_path}"}
 
-    # Load trained model
-    model = load_model(model_path)
+    # Load trained model with auto-retraining for compatibility issues
+    try:
+        model = load_model(model_path)
+    except Exception as e:
+        if "time_major" in str(e) or "Unrecognized keyword arguments" in str(e):
+            print(f"🔄 Model compatibility issue detected for {stock_symbol}. Auto-retraining...")
+            
+            # Auto-retrain the model
+            from backend_process.train_model import train_lstm_model
+            retrain_result = train_lstm_model(stock_symbol)
+            
+            if retrain_result.get("status") == "success":
+                print(f"✅ Model retrained successfully for {stock_symbol}")
+                # Reload the newly trained model
+                model = load_model(retrain_result["model_path"])
+            else:
+                return {"status": "error", "message": f"Failed to auto-retrain model for {stock_symbol}: {retrain_result.get('reason', 'Unknown error')}"}
+        else:
+            return {"status": "error", "message": f"Error loading model: {str(e)}"}
 
     # Fetch recent 60 days of data
     end_date = datetime.now()
@@ -111,7 +144,53 @@ def predict_stock_price(stock_symbol, days_to_predict=5):
 
 
 
+def cleanup_incompatible_models():
+    """Remove all models that might have compatibility issues"""
+    try:
+        print("🧹 Cleaning up potentially incompatible models...")
+        
+        # Get all model records
+        all_models = list(collection.find())
+        cleaned_count = 0
+        
+        for model_record in all_models:
+            model_path = model_record.get("model_path", "")
+            stock_symbol = model_record.get("stock_symbol", "")
+            
+            if os.path.exists(model_path):
+                try:
+                    # Try to load the model
+                    temp_model = load_model(model_path)
+                    print(f"✅ {stock_symbol} model is compatible")
+                except Exception as e:
+                    if "time_major" in str(e) or "Unrecognized keyword arguments" in str(e):
+                        print(f"🗑️ Removing incompatible model for {stock_symbol}")
+                        
+                        # Remove the file
+                        os.remove(model_path)
+                        
+                        # Remove from database
+                        collection.delete_one({"_id": model_record["_id"]})
+                        cleaned_count += 1
+                    else:
+                        print(f"⚠️ {stock_symbol} has other issues: {str(e)}")
+            else:
+                print(f"🗑️ Removing database record for missing model: {stock_symbol}")
+                collection.delete_one({"_id": model_record["_id"]})
+                cleaned_count += 1
+        
+        print(f"🧹 Cleanup complete. Removed {cleaned_count} incompatible models.")
+        return {"cleaned": cleaned_count}
+        
+    except Exception as e:
+        print(f"❌ Error during cleanup: {str(e)}")
+        return {"error": str(e)}
+
 # Run manually for testing
 if __name__ == "__main__":
-    stock_symbol = input("Enter stock symbol (e.g. AAPL, TSLA): ").upper()
-    result = predict_stock_price(stock_symbol)
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "cleanup":
+        cleanup_incompatible_models()
+    else:
+        stock_symbol = input("Enter stock symbol (e.g. AAPL, TSLA): ").upper()
+        result = predict_stock_price(stock_symbol)

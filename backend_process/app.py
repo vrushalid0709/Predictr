@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template
 from dotenv import load_dotenv
 import os
@@ -20,6 +21,9 @@ from backend_process.routes.predict_route import predict_bp
 
 
 load_dotenv()
+
+
+
 
 app = Flask(
     __name__,

@@ -4,11 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Predictr — User Dashboard</title>
-  
-  <!-- Tailwind CSS Framework -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  
-  <!-- Custom Brand Colors Configuration -->
   <script>
     tailwind = {
       config: {
@@ -28,12 +24,13 @@
       }
     }
   </script>
-  
-  <!-- Custom Styles and Animations -->
   <style>
     * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .fade-up { opacity: 0; transform: translateY(12px); animation: fadeUp .5s ease-out forwards; }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
     .card-hover { transition: all .25s cubic-bezier(.4,0,.2,1); }
     .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(36,45,58,.08); }
+    .gradient-text { background: linear-gradient(45deg,#387ef5,#00c851); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="../static/js/dashboard.js"></script>
@@ -41,22 +38,14 @@
 </head>
 <body class="bg-white text-brand-navy antialiased" data-userid="{{ user_id }}">
 
-  <!-- =========================== NAVIGATION BAR =========================== -->
-  <nav class="fixed top-0 inset-x-0 bg-white/95 border-gray-100 backdrop-blur z-50">
   <nav class="fixed top-0 inset-x-0 bg-white/95  border-gray-100 backdrop-blur z-50">
     <div class="max-w-7xl mx-auto px-4">
       <div class="h-16 flex items-center justify-between">
-        <!-- Left Section: Logo and Brand -->
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 bg-brand-blue rounded-lg flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
-            </svg>
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
           </div>
           <img src="{{ url_for('static', filename='assets/logo_file/svg/color-logo.svg') }}" class="w-30 h-30 rounded-lg" alt="Company Logo"/>
-        </div>
-        
-        <!-- Right Section: Currency Selector and User Info -->
           </div>
         <div class="flex items-center gap-3">
           <div class="hidden sm:flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
@@ -69,27 +58,24 @@
             </select>
           </div>
           <div class="flex items-center gap-2">
-            <img src="{{ url_for('static', filename='assets/elements/user.png') }}" class="w-8 h-8 rounded-full" alt="avatar"/>
-            <span class="hidden sm:block text-sm font-medium">Hi, {{ user_name }}</span>
-          </div>
+          <img src="{{ url_for('static', filename='assets/elements/user.png') }}" class="w-8 h-8 rounded-full" alt="avatar"/>
+         <span class="hidden sm:block text-sm font-medium">Hi, {{ user_name }}</span>
+         </div>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- =========================== MAIN LAYOUT =========================== -->
   <div class="pt-20 max-w-7xl mx-auto px-4 grid grid-cols-12 gap-6">
-    
-    <!-- =========================== SIDEBAR =========================== -->
     <aside class="col-span-12 md:col-span-3 lg:col-span-2">
       <div class="bg-brand-light border border-gray-100 rounded-2xl p-3 md:p-4 sticky top-24">
-        <!-- Navigation Menu -->
         <a data-nav="overview" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover bg-white shadow">Overview</a>
         <a data-nav="mystocks" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">My Stocks</a>
-        <a data-nav="transactions" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">Transactions</a>
-        <a data-nav="settings" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">Settings</a>
+       <a data-nav="transactions" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">Transactions</a>
+      <a data-nav="simulation" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">Simulation</a>
+      <a data-nav="settings" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">Settings</a>
         
-        <!-- Live Exchange Rates Widget -->
+        <div class="mt-6 p-3 bg-white rounded-xl shadow-sm">
         <div class="mt-6 p-3 bg-white rounded-xl shadow-sm">
           <h3 class="text-sm font-semibold text-gray-700 mb-3">
             Live Exchange Rates
@@ -120,20 +106,12 @@
       </div>
     </aside>
 
-    <!-- =========================== MAIN CONTENT =========================== -->
-    <main class="col-span-12 md:col-span-9 lg:col-span-10 space-y-6 pb-16">
-      
-      <!-- =========================== PORTFOLIO OVERVIEW SECTION =========================== -->
-      <section id="section-overview">
-        <!-- Section Header -->
     <main class="col-span-12 md:col-span-9 lg:col-span-10 space-y-6 pb-16">
       <section id="section-overview">
         <div class="flex items-center justify-between">
           <h1 class="text-2xl md:text-3xl font-bold">Portfolio Overview</h1>
           <div class="text-sm text-gray-500">Live data from APIs & Database</div>
         </div>
-        
-        <!-- KPI Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
           <div class="bg-white border border-gray-100 rounded-2xl p-5 card-hover">
             <div class="text-sm text-gray-500">Total Invested</div>
@@ -153,33 +131,6 @@
           </div>
         </div>
 
-        <!-- Stock Search Bar -->
-        <div class="relative bg-white border border-gray-100 rounded-2xl p-5 mt-6 flex items-center gap-3">
-          <input id="stockSearchInput" type="text" class="border border-gray-200 rounded-lg px-4 py-2 w-full" placeholder="Search your stocks by symbol or name..." />
-          <button id="stockSearchBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Search</button>
-        </div>
-
-        <!-- Stock Analysis Dashboard -->
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mt-6">
-          <!-- Prediction Graph Panel -->
-          <div class="col-span-2 bg-white border border-gray-100 rounded-2xl p-5 flex flex-col">
-            <div class="flex items-center justify-between mb-2">
-              <div class="font-semibold">Stock Prediction Graph</div>
-              <div class="flex items-center gap-2">
-                <label for="predictionRange" class="text-xs text-gray-500">Range:</label>
-                <select id="predictionRange" class="border border-gray-200 rounded-lg px-2 py-1 text-xs">
-                  <option value="7">7 Days</option>
-                  <option value="30">1 Month</option>
-                  <option value="90">3 Months</option>
-                  <option value="365">1 Year</option>
-                </select>
-              </div>
-            </div>
-            <div class="flex-1 flex items-center justify-center">
-              <canvas id="predictionGraph" class="w-full h-48"></canvas>
-            </div>
-            <div class="mt-2 text-xs text-gray-500">Scroll or select range to view predictions for next n days/months/years.</div>
-          </div>
         <div class="relative bg-white border border-gray-100 rounded-2xl p-5 mt-6 flex items-center gap-3">
   <input id="stockSearchInput" type="text" class="border border-gray-200 rounded-lg px-4 py-2 w-full" placeholder="Search your stocks by symbol or name..." />
   <button id="stockSearchBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Search</button>
@@ -216,41 +167,37 @@
 </div>
 
 
-          <!-- Stock Information Cards -->
-          <div class="col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
-            <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
-              <div class="text-sm text-gray-500">Amount Invested</div>
-              <div id="info-invested" class="text-xl font-semibold mt-1">50,000</div>
-            </div>
-            <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
-              <div class="text-sm text-gray-500">Predicted Value</div>
-              <div id="info-predicted" class="text-xl font-semibold mt-1">52,500</div>
-            </div>
-            <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
-              <div class="text-sm text-gray-500">Prediction Accuracy</div>
-              <div id="info-accuracy" class="text-xl font-semibold mt-1">95%</div>
-            </div>
-            <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
-              <div class="text-sm text-gray-500">Other Details</div>
-              <div id="info-other" class="text-xl font-semibold mt-1">All positions stable</div>
-            </div>
-          </div>
+  <div class="col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
+    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+      <div class="text-sm text-gray-500">Amount Invested</div>
+      <div id="info-invested" class="text-xl font-semibold mt-1">50,000</div>
+    </div>
+    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+      <div class="text-sm text-gray-500">Predicted Value</div>
+      <div id="info-predicted" class="text-xl font-semibold mt-1">52,500</div>
+    </div>
+    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+      <div class="text-sm text-gray-500">Prediction Accuracy</div>
+      <div id="info-accuracy" class="text-xl font-semibold mt-1">95%</div>
+    </div>
+    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+      <div class="text-sm text-gray-500">Other Details</div>
+      <div id="info-other" class="text-xl font-semibold mt-1">All positions stable</div>
+    </div>
+  </div>
 
-          <!-- Action Buttons (Hidden by default, shown after search) -->
-          <div id="search-actions" class="col-span-3 md:col-span-5 mt-4">
-            <button id="prepareAddStockBtn" class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg w-full card-hover">
-              Add This Stock to My Portfolio
-            </button>
-            <button id="saveStockBtn" class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg w-full card-hover">
-              Quick Save
-            </button>
-          </div>
-        </div>
+  <div id="search-actions" class="col-span-3 md:col-span-5 mt-4">
+      <button id="prepareAddStockBtn" class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg w-full card-hover">
+        Add This Stock to My Portfolio
+      </button>
+      <button id="saveStockBtn" class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg w-full card-hover">
+      Quick Save
+    </button>
+  </div>
+  
+</div>
       </section>
 
-      <!-- =========================== MY STOCKS SECTION =========================== -->
-      <section id="section-mystocks" class="hidden">
-        <!-- Section Header -->
 
       <section id="section-mystocks" class="hidden">
         <div class="flex items-center justify-between">
@@ -261,7 +208,6 @@
           </div>
         </div>
 
-        <!-- Stocks Table -->
         <div class="mt-4 overflow-x-auto bg-white border border-gray-100 rounded-2xl">
           <table class="min-w-full text-sm">
             <thead class="bg-brand-light text-gray-600">
@@ -278,11 +224,9 @@
             <tbody id="stocksTbody" class="divide-y divide-gray-100"></tbody>
           </table>
         </div>
+        <div class="h-25"></div>
       </section>
 
-      <!-- =========================== TRANSACTIONS SECTION =========================== -->
-      <section id="section-transactions" class="hidden">
-        <!-- Section Header -->
       
 
       <section id="section-transactions" class="hidden">
@@ -290,8 +234,6 @@
           <h2 class="text-xl md:text-2xl font-bold">Transactions</h2>
           <div class="text-sm text-gray-500">Auto-generated from your buys/sells</div>
         </div>
-        
-        <!-- Transactions Table -->
         <div class="mt-4 overflow-x-auto bg-white border border-gray-100 rounded-2xl">
           <table class="min-w-full text-sm">
             <thead class="bg-brand-light text-gray-600">
@@ -307,13 +249,12 @@
             <tbody id="txTbody" class="divide-y divide-gray-100"></tbody>
           </table>
         </div>
+        <div class="h-50"></div>
       </section>
 
-      <!-- =========================== SETTINGS SECTION =========================== -->
       <section id="section-settings" class="hidden">
         <h2 class="text-xl md:text-2xl font-bold mb-4">Settings</h2>
         <div class="grid md:grid-cols-2 gap-4">
-          <!-- Currency Settings -->
           <div class="bg-white border border-gray-100 rounded-2xl p-5">
             <div class="font-semibold mb-3">Currency</div>
             <p class="text-sm text-gray-600 mb-2">Choose the display currency for your portfolio.</p>
@@ -324,26 +265,20 @@
               <option value="GBP">GBP £</option>
             </select>
           </div>
-        </div>
           </div>
         <div class="h-25"></div>
       </section>
     </main>
   </div>
   
-  <!-- =========================== ADD/EDIT STOCK MODAL =========================== -->
 
   <div id="stockModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center z-[60]">
     <div class="bg-white w-full max-w-lg rounded-2xl p-6 border border-gray-100 shadow-xl">
-      <!-- Modal Header -->
       <div class="flex items-center justify-between mb-4">
         <h3 id="modalTitle" class="text-lg font-semibold">Add Stock</h3>
         <button id="closeModal" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center">✕</button>
       </div>
-      
-      <!-- Stock Form -->
       <form id="stockForm" class="grid grid-cols-2 gap-4">
-        <!-- Input Fields Row 1 -->
         <div class="col-span-1">
           <label class="text-sm text-gray-600">Stock Symbol</label>
           <input id="fSymbol" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="AAPL" />
@@ -352,14 +287,10 @@
           <label class="text-sm text-gray-600">Company Name</label>
           <input id="fCompanyInput" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="Apple Inc." />
         </div>
-        
-        <!-- Fetch Details Button -->
         <div class="col-span-2 flex items-center gap-2">
           <button type="button" id="lookupBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Fetch Details</button>
           <span id="lookupStatus" class="text-sm text-success"></span>
         </div>
-        
-        <!-- Auto-filled Information -->
         <div class="col-span-1">
           <label class="text-sm text-gray-600">Company Name</label>
           <input id="fCompany" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 bg-brand-light text-gray-500" readonly />
@@ -376,8 +307,6 @@
           <label class="text-sm text-gray-600">Sector</label>
           <input id="fSector" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 bg-brand-light text-gray-500" readonly />
         </div>
-        
-        <!-- User Input Fields -->
         <div class="col-span-1">
           <label class="text-sm text-gray-600">Quantity</label>
           <input id="fQty" type="number" min="1" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="10" required />
@@ -394,11 +323,7 @@
           <label class="text-sm text-gray-600">Date</label>
           <input id="fDate" type="date" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" required />
         </div>
-        
-        <!-- Hidden Fields -->
         <input type="hidden" id="editingIndex" value="" />
-        
-        <!-- Modal Actions -->
         <div class="col-span-2 flex items-center justify-end gap-3 mt-2">
           <button type="button" id="resetModal" class="px-4 py-2 border rounded-lg">Reset</button>
           <button type="button" id="cancelModal" class="px-4 py-2 border rounded-lg">Cancel</button>
@@ -407,11 +332,8 @@
       </form>
     </div>
   </div>
-  
-  <!-- Spacer for footer -->
   <div class="h-40"></div>
 
-  <!-- =========================== FOOTER =========================== -->
   <footer class="mt-10 border-t border-gray-100 py-8 bg-brand-light">
     <div class="max-w-7xl mx-auto px-4 text-sm text-gray-600 flex flex-wrap items-center justify-between gap-4">
       <div>© <span id="year"></span> Predictr — Dashboard</div>
@@ -424,60 +346,57 @@
   </footer>
 
 <script>
-  // =========================== GLOBAL VARIABLES AND CONFIGURATION ===========================
-  
-  // Live currency exchange rates (updated from API)
+  // ===== Live currency rates (will be updated from API) =====
   let FX = { USD: 1, EUR: 0.92, GBP: 0.78, INR: 84 }; // Default fallback rates
   const DEFAULT_CCY = localStorage.getItem('predictr_ccy') || 'INR';
 
-  // Application state management
+  // ===== State =====
   let state = JSON.parse(localStorage.getItem('predictr_state')||'null') || {
     currency: DEFAULT_CCY,
     stocks: [],
     transactions: []
   };
 
-  // Global variable to store form data between handlers
-  let formDataForServer = null;
-
-  // =========================== UTILITY FUNCTIONS ===========================
-  
-  // DOM helper functions
+  // ===== Utilities =====
   const el = sel => document.querySelector(sel);
   const els = sel => Array.from(document.querySelectorAll(sel));
-  // Currency formatting function
   const fmt = (v) => {
     const cur = state.currency;
     const usd = v;
     const fxRate = FX[cur] || 1;
     const converted = usd * fxRate;
     const symbol = cur==='USD'?'$':cur==='EUR'?'€':cur==='GBP'?'£':'₹';
+    // Using live exchange rates for conversion
     return symbol + converted.toLocaleString(undefined,{maximumFractionDigits:2});
   };
   
-  // Currency conversion between different currencies
+  // Format value in specific currency (for individual stocks)
+  const fmtCurrency = (v, currency) => {
+    const symbol = currency==='USD'?'$':currency==='EUR'?'€':currency==='GBP'?'£':'₹';
+    return symbol + v.toLocaleString(undefined,{maximumFractionDigits:2});
+  };
+  
+  // Convert amount from one currency to another using live exchange rates
   const convertCurrency = (amount, fromCurrency, toCurrency) => {
     if (fromCurrency === toCurrency) return amount;
     
     const fromRate = FX[fromCurrency] || 1;
     const toRate = FX[toCurrency] || 1;
     
-    // Convert from source currency to USD first, then to target currency
+    // Convert from source currency to USD first
     const amountInUSD = amount / fromRate;
+    
+    // Convert from USD to target currency
     const amountInTarget = amountInUSD * toRate;
     
     return amountInTarget;
   };
-  
-  // Save application state to localStorage
   const save = () => {
     localStorage.setItem('predictr_state', JSON.stringify(state));
     localStorage.setItem('predictr_ccy', state.currency);
   };
 
-  // =========================== PORTFOLIO CALCULATION FUNCTIONS ===========================
-  
-  // Calculate portfolio totals and metrics
+  // ===== Derived metrics =====
   function totals() {
   // Always calculate KPIs in user's default currency (INR) for consistency
   let invested = 0, current = 0;
@@ -530,14 +449,15 @@
   return { invested, current, pl, plp };
 }
 
-  // Refresh all currency-dependent displays when exchange rates update
+  // ===== Refresh All Currency-Dependent Displays =====
   function refreshAllCurrencyDisplays() {
     console.log('🔄 Refreshing all currency displays with updated rates');
     renderKPIs();
     renderStocks();
+    // Update any other currency-dependent UI elements here
   }
 
-  // =========================== UI RENDERING FUNCTIONS ===========================
+  // ===== Rendering =====
   function renderKPIs(){
     const t = totals();
     const currencySymbol = state.currency==='USD'?'$':state.currency==='EUR'?'€':state.currency==='GBP'?'£':'₹';
@@ -592,7 +512,6 @@
 }
 
 
-  // Render sparkline chart (currently unused but kept for future implementation)
   function renderSparkline(){
     const sparkPath = el('#sparkPath');
     const sparkFill = el('#sparkFill');
@@ -636,8 +555,8 @@
         <td class="p-3 text-right">${fmt(curUSD)}</td>
         <td class="p-3 text-right ${plUSD>=0?'text-success':'text-danger'}">${plUSD>=0?'+':''}${fmt(Math.abs(plUSD))}</td>
         <td class="p-3 text-right">
-          <button data-edit="${idx}" class="px-3 py-1.5 text-xs rounded-lg border border-gray-300 mr-2 hover:bg-gray-50 hover:border-gray-400 transition-colors">Edit</button>
-          <button data-del="${idx}" class="px-3 py-1.5 text-xs rounded-lg border border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 transition-colors">Delete</button>
+          <button data-edit="${idx}" class="px-3 py-1.5 text-xs rounded-lg border mr-2 hover:bg-gray-50">Edit</button>
+          <button data-del="${idx}" class="px-3 py-1.5 text-xs rounded-lg border hover:bg-gray-50">Delete</button>
         </td>`;
       tbody.appendChild(tr);
     });
@@ -668,9 +587,7 @@
     save();
   }
 
-  // =========================== NAVIGATION FUNCTIONS ===========================
-  
-  // Show/hide sections based on navigation selection
+  // ===== Navigation =====
   function showSection(id){
     ['overview','mystocks','transactions','settings'].forEach(key=>{
       const sec = el('#section-'+key);
@@ -690,7 +607,7 @@
   }
   els('.nav-item').forEach(a=> a.addEventListener('click', ()=> showSection(a.dataset.nav)));
 
-  // =========================== MODAL MANAGEMENT FUNCTIONS ===========================
+  // ===== Modal =====
   const openModal = () => { el('#stockModal').classList.remove('hidden'); };
   const closeModal = () => { el('#stockModal').classList.add('hidden'); el('#stockForm').reset(); el('#editingIndex').value=''; el('#modalTitle').textContent='Add Stock'; };
   el('#resetModal').addEventListener('click', ()=> {
@@ -729,25 +646,9 @@
       const idx = +del.dataset.del;
       const s = state.stocks[idx];
       
-      // Enhanced confirmation dialog with more details
-      const confirmMessage = `⚠️ DELETE STOCK CONFIRMATION ⚠️
-
-Are you sure you want to permanently delete this stock from your portfolio?
-
-Stock: ${s.symbol} (${s.company})
-Quantity: ${s.qty} shares
-Buy Price: ${fmt(s.buy / (FX[s.currency] || 1))}
-Current Value: ${fmt((s.current / (FX[s.currency] || 1)) * s.qty)}
-
-⚠️ This action cannot be undone!
-
-Click OK to delete or Cancel to keep the stock.`;
-      
-      if (confirm(confirmMessage)) {
-        console.log('🗑️ User confirmed deletion of stock:', s.symbol);
+      if (confirm(`Are you sure you want to delete ${s.symbol} (${s.company})?`)) {
+        console.log('🗑️ Deleting stock:', s.symbol);
         deleteStockFromServer(s.symbol, idx);
-      } else {
-        console.log('ℹ️ User cancelled deletion of stock:', s.symbol);
       }
     }
   });
@@ -830,8 +731,9 @@ Click OK to delete or Cancel to keep the stock.`;
     showSection('mystocks');
   });
 
-  // =========================== STOCK PERSISTENCE FUNCTIONS ===========================
-  
+  // Global variable to store form data between handlers
+  let formDataForServer = null;
+
   // Send saved stock to backend so it persists in MongoDB
   el('#stockForm').addEventListener('submit', async (e) => {
     // This second listener runs after the first (above) to persist the record.
@@ -1073,9 +975,7 @@ Click OK to delete or Cancel to keep the stock.`;
     }
   });
 
-  // =========================== DEBUG AND UTILITY FUNCTIONS ===========================
-  
-  // Debug function for form elements (development use only)
+  // ===== Debug Function =====
   function debugFormElements() {
     console.log('🔧 Form Elements Debug:');
     const elements = ['#fSymbol', '#fCompany', '#fQty', '#fBuy', '#fCurrent', '#fDate'];
@@ -1085,36 +985,63 @@ Click OK to delete or Cancel to keep the stock.`;
     });
   }
 
-  // =========================== APPLICATION INITIALIZATION ===========================
+  // Make debug functions globally available
+  window.debugFormElements = debugFormElements;
   
-  // Initialize the dashboard application
+  // Add a manual form inspector
+  window.inspectForm = function() {
+    console.log('🔍 Manual Form Inspection:');
+    console.log('Symbol input element:', document.getElementById('fSymbol'));
+    console.log('Symbol input value:', document.getElementById('fSymbol')?.value);
+    console.log('Symbol input innerHTML:', document.getElementById('fSymbol')?.outerHTML);
+    console.log('All form inputs:');
+    const form = document.getElementById('stockForm');
+    const inputs = form?.querySelectorAll('input');
+    inputs?.forEach((input, index) => {
+      console.log(`  Input ${index}: id="${input.id}", value="${input.value}", placeholder="${input.placeholder}"`);
+    });
+  };
+
+  // ===== Init =====
   (function init(){
-    // Set current year in footer
     document.getElementById('year').textContent = new Date().getFullYear();
-    
-    // Show default section and render all components
+    // setTheme(state.theme);
     showSection('overview');
     renderAll();
     
+    // Debug info on page load
     console.log('🚀 Dashboard initialized');
     console.log('👤 User ID from data attribute:', document.body.dataset.userid);
     
-    // Set up form event listeners after DOM is loaded
+    // Add a delay to ensure DOM is fully loaded, then debug form elements
     setTimeout(() => {
+      debugFormElements();
+      
+      // Add event listeners to track form field changes
       const symbolInput = el('#fSymbol');
       if (symbolInput) {
+        symbolInput.addEventListener('input', (e) => {
+          console.log('📝 Symbol field changed to: "' + e.target.value + '"');
+        });
         symbolInput.addEventListener('blur', (e) => {
+          console.log('👁️ Symbol field lost focus, value: "' + e.target.value + '"');
           const symbol = e.target.value.trim().toUpperCase();
           if (symbol && symbol.length >= 2) {
             fetchCurrentPrice(symbol);
           }
         });
       }
+      
+      // Track form reset events
+      const form = el('#stockForm');
+      if (form) {
+        form.addEventListener('reset', () => {
+          console.log('🔄 Form was reset');
+        });
+      }
     }, 1000);
   })();
-  // =========================== STOCK SEARCH FUNCTIONALITY ===========================
-  
-  // Alternative querySelector helper
+   // Safe helper name (replaces el)
   const qs = (selector) => document.querySelector(selector);
 
   // Find the search bar element
@@ -1287,9 +1214,6 @@ if (searchBtn) {
     });
   }
 
-  // =========================== STOCK DATA FUNCTIONS ===========================
-  
-  // Automatically fetch current stock price
 // ===== Stock Prediction Logic (Auto Mode) =====
 
 // Fetch prediction data for a selected stock
@@ -1507,7 +1431,7 @@ if (qs('#stockSearchBtn')) {
     }
   }
 
-  // Delete stock from server and update local state
+  // ===== Delete Stock from Server =====
   async function deleteStockFromServer(symbol, localIndex) {
     try {
       const userId = document.body.dataset.userid || document.body.getAttribute('data-userid');
@@ -1548,20 +1472,18 @@ if (qs('#stockSearchBtn')) {
         state.stocks.splice(localIndex, 1);
         
         renderAll();
-        alert(`✅ SUCCESS: ${symbol} has been permanently deleted from your portfolio!`);
+        alert(`✅ ${symbol} deleted successfully!`);
       } else {
         console.error('❌ Failed to delete from server:', data);
-        alert(`❌ DELETION FAILED: Could not delete ${symbol} from your portfolio.\n\nError: ${data.error || 'Unknown server error'}\n\nPlease try again or contact support if the issue persists.`);
+        alert(`❌ Error deleting ${symbol}: ${data.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('💥 Error deleting stock:', error);
-      alert(`❌ CONNECTION ERROR: Could not delete ${symbol} from your portfolio.\n\nError: ${error.message}\n\nPlease check your internet connection and try again.`);
+      alert(`❌ Error deleting ${symbol}: ${error.message}`);
     }
   }
 
-  // =========================== EXCHANGE RATE FUNCTIONS ===========================
-  
-  // Fetch live exchange rates from API
+  // ===== Fetch Live Exchange Rates =====
   async function fetchExchangeRates() {
     try {
       console.log('💱 Fetching live exchange rates...');
@@ -1635,8 +1557,8 @@ if (qs('#stockSearchBtn')) {
     }
   }
 
-  // Load user's stocks from server and update UI
-  async function loadMyStocks() {
+  // ===== Fetch and Display My Stocks =====
+async function loadMyStocks() {
   // Get user_id from multiple sources
   const userId = document.body.dataset.userid || document.body.getAttribute('data-userid');
   
@@ -1706,19 +1628,17 @@ if (qs('#stockSearchBtn')) {
   }
 }
 
-  // =========================== PAGE INITIALIZATION ===========================
+// Load saved stocks when page opens
+document.addEventListener("DOMContentLoaded", () => {
+  loadMyStocks();
+  fetchExchangeRates();
   
-  // Load data when page opens
-  document.addEventListener("DOMContentLoaded", () => {
-    loadMyStocks();
-    fetchExchangeRates();
-    
-    // Refresh exchange rates every 30 minutes
-    setInterval(fetchExchangeRates, 30 * 60 * 1000);
-  });
+  // Refresh exchange rates every 30 minutes
+  setInterval(fetchExchangeRates, 30 * 60 * 1000);
+});
 
-  // Save stock to database (Quick Save functionality)
-  const saveBtn = document.getElementById("saveStockBtn");
+  // ===== Save Stock to MongoDB =====
+const saveBtn = document.getElementById("saveStockBtn");
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
     const symbol = document.getElementById("stockSearchInput").value.trim();
@@ -1766,8 +1686,8 @@ if (saveBtn) {
     }
   });
 }
-  // Remove a stock from user's portfolio
-  async function removeStock(symbol) {
+// ===== Remove a Stock =====
+async function removeStock(symbol) {
   if (!confirm(`Are you sure you want to remove ${symbol}?`)) {
     return;
   }
@@ -1797,8 +1717,7 @@ if (saveBtn) {
     alert("Could not connect to the server.");
   }
 }
-
-  // =========================== AI CHATBOT FUNCTIONALITY ===========================
+// =========================== AI CHATBOT FUNCTIONALITY ===========================
   
   // Chatbot state management
   let isChatbotOpen = false;
