@@ -43,10 +43,12 @@ mail.init_app(app)
 # Import blueprints AFTER extensions are initialized
 from backend_process.routes.auth_routes import auth
 from backend_process.routes.otp_routes import otp
+from backend_process.routes.gemini_routes import gemini_bp
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(otp, url_prefix='/otp')
 app.register_blueprint(fetch_stock, url_prefix='/api')
 app.register_blueprint(stock_routes, url_prefix="/api")
+app.register_blueprint(gemini_bp, url_prefix="/api")
 app.register_blueprint(predict_bp)
 
 
