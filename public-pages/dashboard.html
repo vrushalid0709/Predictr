@@ -4,47 +4,60 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Predictr — User Dashboard</title>
+  
+  <!-- Tailwind CSS Framework -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
+  <!-- Custom Brand Colors Configuration -->
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'brand-blue': '#387ef5',
-            'brand-navy': '#242d3a',
-            'brand-light': '#f8fafd',
-            'success': '#00c851',
-            'warning': '#ff9f43',
-            'danger': '#ee5a52',
-            'muted': '#9eb3c2'
+    tailwind = {
+      config: {
+        theme: {
+          extend: {
+            colors: {
+              'brand-blue': '#387ef5',
+              'brand-navy': '#242d3a',
+              'brand-light': '#f8fafd',
+              'success': '#00c851',
+              'warning': '#ff9f43',
+              'danger': '#ee5a52',
+              'muted': '#9eb3c2'
+            }
           }
         }
       }
     }
   </script>
+  
+  <!-- Custom Styles and Animations -->
   <style>
     * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    .fade-up { opacity: 0; transform: translateY(12px); animation: fadeUp .5s ease-out forwards; }
-    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
     .card-hover { transition: all .25s cubic-bezier(.4,0,.2,1); }
     .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(36,45,58,.08); }
-    .gradient-text { background: linear-gradient(45deg,#387ef5,#00c851); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
   </style>
-</head>
-<body class="bg-white text-brand-navy antialiased">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../static/js/dashboard.js"></script>
 
-  <!-- Top Nav -->
+</head>
+<body class="bg-white text-brand-navy antialiased" data-userid="{{ user_id }}">
+
+  <!-- =========================== NAVIGATION BAR =========================== -->
+  <nav class="fixed top-0 inset-x-0 bg-white/95 border-gray-100 backdrop-blur z-50">
   <nav class="fixed top-0 inset-x-0 bg-white/95  border-gray-100 backdrop-blur z-50">
     <div class="max-w-7xl mx-auto px-4">
       <div class="h-16 flex items-center justify-between">
+        <!-- Left Section: Logo and Brand -->
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 bg-brand-blue rounded-lg flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+            </svg>
           </div>
-          <!--Add Company Logo-->
           <img src="{{ url_for('static', filename='assets/logo_file/svg/color-logo.svg') }}" class="w-30 h-30 rounded-lg" alt="Company Logo"/>
-          <!-- <span class="text-lg font-semibold">Predictr Dashboard</span> -->
         </div>
+        
+        <!-- Right Section: Currency Selector and User Info -->
+          </div>
         <div class="flex items-center gap-3">
           <div class="hidden sm:flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
             <span class="text-xs text-gray-500">Currency</span>
@@ -55,126 +68,191 @@
               <option value="GBP">GBP £</option>
             </select>
           </div>
-          <button id="themeToggle" class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm hover:bg-gray-50">Light</button>
           <div class="flex items-center gap-2">
             <img src="{{ url_for('static', filename='assets/elements/user.png') }}" class="w-8 h-8 rounded-full" alt="avatar"/>
-            <span class="hidden sm:block text-sm font-medium">Hi, Alex</span>
+            <span class="hidden sm:block text-sm font-medium">Hi, {{ user_name }}</span>
           </div>
         </div>
       </div>
     </div>
   </nav>
 
+  <!-- =========================== MAIN LAYOUT =========================== -->
   <div class="pt-20 max-w-7xl mx-auto px-4 grid grid-cols-12 gap-6">
-    <!-- Sidebar -->
+    
+    <!-- =========================== SIDEBAR =========================== -->
     <aside class="col-span-12 md:col-span-3 lg:col-span-2">
       <div class="bg-brand-light border border-gray-100 rounded-2xl p-3 md:p-4 sticky top-24">
+        <!-- Navigation Menu -->
         <a data-nav="overview" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover bg-white shadow">Overview</a>
         <a data-nav="mystocks" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">My Stocks</a>
         <a data-nav="transactions" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">Transactions</a>
         <a data-nav="settings" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">Settings</a>
+        
+        <!-- Live Exchange Rates Widget -->
+        <div class="mt-6 p-3 bg-white rounded-xl shadow-sm">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">
+            Live Exchange Rates
+            <span id="rate-status-indicator" class="inline-block w-2 h-2 bg-yellow-400 rounded-full ml-2" title="Loading rates..."></span>
+          </h3>
+          <div class="text-xs text-gray-600 space-y-1">
+            <div class="flex justify-between">
+              <span>1 USD =</span>
+              <span id="rate-usd" class="font-mono">Loading...</span>
+            </div>
+            <div class="flex justify-between">
+              <span>1 EUR =</span>
+              <span id="rate-eur" class="font-mono">Loading...</span>
+            </div>
+            <div class="flex justify-between">
+              <span>1 GBP =</span>
+              <span id="rate-gbp" class="font-mono">Loading...</span>
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-t border-gray-100">
+            <p class="text-xs text-gray-500">
+              <span class="font-medium">Base:</span> 1 INR to other currencies<br>
+              <span class="font-medium">Source:</span> ExchangeRate-API<br>
+              <span class="font-medium">Updated:</span> <span id="rate-timestamp">Loading...</span>
+            </p>
+          </div>
+        </div>
       </div>
     </aside>
 
-    <!-- Main -->
+    <!-- =========================== MAIN CONTENT =========================== -->
     <main class="col-span-12 md:col-span-9 lg:col-span-10 space-y-6 pb-16">
-      <!-- Overview -->
-  <section id="section-overview">
+      
+      <!-- =========================== PORTFOLIO OVERVIEW SECTION =========================== -->
+      <section id="section-overview">
+        <!-- Section Header -->
+    <main class="col-span-12 md:col-span-9 lg:col-span-10 space-y-6 pb-16">
+      <section id="section-overview">
         <div class="flex items-center justify-between">
           <h1 class="text-2xl md:text-3xl font-bold">Portfolio Overview</h1>
-          <button id="refreshPrices" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border-b hover:bg-[#b2e0d4]">Update Prices</button>
+          <div class="text-sm text-gray-500">Live data from APIs & Database</div>
         </div>
+        
+        <!-- KPI Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-          <!-- Cards -->
           <div class="bg-white border border-gray-100 rounded-2xl p-5 card-hover">
             <div class="text-sm text-gray-500">Total Invested</div>
-            <div id="kpi-invested" class="text-2xl font-semibold mt-1">—</div>
+            <div id="kpi-invested" class="text-2xl font-semibold mt-1">₹0</div>
           </div>
           <div class="bg-white border border-gray-100 rounded-2xl p-5 card-hover">
             <div class="text-sm text-gray-500">Current Value</div>
-            <div id="kpi-current" class="text-2xl font-semibold mt-1">—</div>
+            <div id="kpi-current" class="text-2xl font-semibold mt-1">₹0</div>
           </div>
           <div class="bg-white border border-gray-100 rounded-2xl p-5 card-hover">
             <div class="text-sm text-gray-500">P/L (Abs)</div>
-            <div id="kpi-pl" class="text-2xl font-semibold mt-1">—</div>
+            <div id="kpi-pl" class="text-2xl font-semibold mt-1">₹0</div>
           </div>
           <div class="bg-white border border-gray-100 rounded-2xl p-5 card-hover">
             <div class="text-sm text-gray-500">P/L (%)</div>
-            <div id="kpi-plp" class="text-2xl font-semibold mt-1">—</div>
+            <div id="kpi-plp" class="text-2xl font-semibold mt-1">0%</div>
           </div>
         </div>
 
-        <!-- Mini chart (static SVG sparkline based on data) -->
-        <!-- <div class="bg-white border border-gray-100 rounded-2xl p-5 mt-4">
-          <div class="flex items-center justify-between mb-2">
-            <div class="font-semibold">Portfolio Sparkline</div>
-            <div class="text-xs text-gray-500">Last 7 points</div>
-          </div>
-          <svg id="sparkline" viewBox="0 0 300 60" class="w-full h-16">
-            <defs>
-              <linearGradient id="sparkGrad" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stop-color="#387ef5" stop-opacity="0.25" />
-                <stop offset="100%" stop-color="#387ef5" stop-opacity="0.05" />
-              </linearGradient>
-            </defs>
-            <path id="sparkPath" d="" stroke="#387ef5" stroke-width="2.5" fill="none" />
-            <path id="sparkFill" d="" fill="url(#sparkGrad)" />
-          </svg>
-        </div> -->
+        <!-- Stock Search Bar -->
+        <div class="relative bg-white border border-gray-100 rounded-2xl p-5 mt-6 flex items-center gap-3">
+          <input id="stockSearchInput" type="text" class="border border-gray-200 rounded-lg px-4 py-2 w-full" placeholder="Search your stocks by symbol or name..." />
+          <button id="stockSearchBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Search</button>
+        </div>
 
-        <!-- Search Bar for Stocks -->
-<div class="bg-white border border-gray-100 rounded-2xl p-5 mt-6 flex items-center gap-3">
+        <!-- Stock Analysis Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mt-6">
+          <!-- Prediction Graph Panel -->
+          <div class="col-span-2 bg-white border border-gray-100 rounded-2xl p-5 flex flex-col">
+            <div class="flex items-center justify-between mb-2">
+              <div class="font-semibold">Stock Prediction Graph</div>
+              <div class="flex items-center gap-2">
+                <label for="predictionRange" class="text-xs text-gray-500">Range:</label>
+                <select id="predictionRange" class="border border-gray-200 rounded-lg px-2 py-1 text-xs">
+                  <option value="7">7 Days</option>
+                  <option value="30">1 Month</option>
+                  <option value="90">3 Months</option>
+                  <option value="365">1 Year</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex-1 flex items-center justify-center">
+              <canvas id="predictionGraph" class="w-full h-48"></canvas>
+            </div>
+            <div class="mt-2 text-xs text-gray-500">Scroll or select range to view predictions for next n days/months/years.</div>
+          </div>
+        <div class="relative bg-white border border-gray-100 rounded-2xl p-5 mt-6 flex items-center gap-3">
   <input id="stockSearchInput" type="text" class="border border-gray-200 rounded-lg px-4 py-2 w-full" placeholder="Search your stocks by symbol or name..." />
   <button id="stockSearchBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Search</button>
 </div>
 
-<!-- Prediction Graph and Info Blocks -->
 <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mt-6">
-  <!-- Graph (Prediction) -->
-  <div class="col-span-2 bg-white border border-gray-100 rounded-2xl p-5 flex flex-col">
-    <div class="flex items-center justify-between mb-2">
-      <div class="font-semibold">Stock Prediction Graph</div>
-      <div class="flex items-center gap-2">
-        <label for="predictionRange" class="text-xs text-gray-500">Range:</label>
-        <select id="predictionRange" class="border border-gray-200 rounded-lg px-2 py-1 text-xs">
-          <option value="7">7 Days</option>
-          <option value="30">1 Month</option>
-          <option value="90">3 Months</option>
-          <option value="365">1 Year</option>
-        </select>
-      </div>
+
+ <div class="col-span-2 bg-white border border-gray-100 rounded-2xl p-5 flex flex-col">
+  <div class="flex items-center justify-between mb-2">
+    <div class="font-semibold">My Stock Predictions</div>
+    <div class="flex items-center gap-2">
+      <label for="portfolioStockSelect" class="text-xs text-gray-500">Stock:</label>
+      <select id="portfolioStockSelect" class="border border-gray-200 rounded-lg px-2 py-1 text-xs">
+        <option value="">-- Select a Stock --</option>
+      </select>
+      <label for="predictionRange" class="text-xs text-gray-500">Range:</label>
+      <select id="predictionRange" class="border border-gray-200 rounded-lg px-2 py-1 text-xs">
+        <option value="7">7 Days</option>
+        <option value="30">1 Month</option>
+        <option value="90">3 Months</option>
+        <option value="365">1 Year</option>
+      </select>
     </div>
-    <div class="flex-1 flex items-center justify-center">
-      <!-- Placeholder for prediction graph -->
-      <canvas id="predictionGraph" class="w-full h-48"></canvas>
-    </div>
-    <div class="mt-2 text-xs text-gray-500">Scroll or select range to view predictions for next n days/months/years.</div>
   </div>
-  <!-- Info Blocks -->
-  <div class="col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
-    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
-      <div class="text-sm text-gray-500">Amount Invested</div>
-      <div id="info-invested" class="text-xl font-semibold mt-1">—</div>
-    </div>
-    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
-      <div class="text-sm text-gray-500">Predicted Value</div>
-      <div id="info-predicted" class="text-xl font-semibold mt-1">—</div>
-    </div>
-    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
-      <div class="text-sm text-gray-500">Prediction Accuracy</div>
-      <div id="info-accuracy" class="text-xl font-semibold mt-1">—</div>
-    </div>
-    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
-      <div class="text-sm text-gray-500">Other Details</div>
-      <div id="info-other" class="text-xl font-semibold mt-1">—</div>
-    </div>
+  
+  <div class="flex-1 flex items-center justify-center">
+   <canvas id="predictionGraph" class="w-full h-80"></canvas>
+
+  </div>
+
+  <div class="mt-2 text-xs text-gray-500">
+    Scroll or select range to view predictions for next n days/months/years.
   </div>
 </div>
+
+
+          <!-- Stock Information Cards -->
+          <div class="col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
+            <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+              <div class="text-sm text-gray-500">Amount Invested</div>
+              <div id="info-invested" class="text-xl font-semibold mt-1">50,000</div>
+            </div>
+            <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+              <div class="text-sm text-gray-500">Predicted Value</div>
+              <div id="info-predicted" class="text-xl font-semibold mt-1">52,500</div>
+            </div>
+            <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+              <div class="text-sm text-gray-500">Prediction Accuracy</div>
+              <div id="info-accuracy" class="text-xl font-semibold mt-1">95%</div>
+            </div>
+            <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+              <div class="text-sm text-gray-500">Other Details</div>
+              <div id="info-other" class="text-xl font-semibold mt-1">All positions stable</div>
+            </div>
+          </div>
+
+          <!-- Action Buttons (Hidden by default, shown after search) -->
+          <div id="search-actions" class="col-span-3 md:col-span-5 mt-4">
+            <button id="prepareAddStockBtn" class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg w-full card-hover">
+              Add This Stock to My Portfolio
+            </button>
+            <button id="saveStockBtn" class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg w-full card-hover">
+              Quick Save
+            </button>
+          </div>
+        </div>
       </section>
 
+      <!-- =========================== MY STOCKS SECTION =========================== -->
+      <section id="section-mystocks" class="hidden">
+        <!-- Section Header -->
 
-      <!-- My Stocks -->
-  <section id="section-mystocks" class="hidden">
+      <section id="section-mystocks" class="hidden">
         <div class="flex items-center justify-between">
           <h2 class="text-xl md:text-2xl font-bold">My Stocks</h2>
           <div class="flex items-center gap-2">
@@ -183,6 +261,7 @@
           </div>
         </div>
 
+        <!-- Stocks Table -->
         <div class="mt-4 overflow-x-auto bg-white border border-gray-100 rounded-2xl">
           <table class="min-w-full text-sm">
             <thead class="bg-brand-light text-gray-600">
@@ -199,17 +278,20 @@
             <tbody id="stocksTbody" class="divide-y divide-gray-100"></tbody>
           </table>
         </div>
-        <div class="h-25"></div>
       </section>
 
+      <!-- =========================== TRANSACTIONS SECTION =========================== -->
+      <section id="section-transactions" class="hidden">
+        <!-- Section Header -->
       
 
-      <!-- Transactions -->
-  <section id="section-transactions" class="hidden">
+      <section id="section-transactions" class="hidden">
         <div class="flex items-center justify-between">
           <h2 class="text-xl md:text-2xl font-bold">Transactions</h2>
           <div class="text-sm text-gray-500">Auto-generated from your buys/sells</div>
         </div>
+        
+        <!-- Transactions Table -->
         <div class="mt-4 overflow-x-auto bg-white border border-gray-100 rounded-2xl">
           <table class="min-w-full text-sm">
             <thead class="bg-brand-light text-gray-600">
@@ -225,13 +307,13 @@
             <tbody id="txTbody" class="divide-y divide-gray-100"></tbody>
           </table>
         </div>
-        <div class="h-50"></div>
       </section>
 
-      <!-- Settings -->
-  <section id="section-settings" class="hidden">
+      <!-- =========================== SETTINGS SECTION =========================== -->
+      <section id="section-settings" class="hidden">
         <h2 class="text-xl md:text-2xl font-bold mb-4">Settings</h2>
         <div class="grid md:grid-cols-2 gap-4">
+          <!-- Currency Settings -->
           <div class="bg-white border border-gray-100 rounded-2xl p-5">
             <div class="font-semibold mb-3">Currency</div>
             <p class="text-sm text-gray-600 mb-2">Choose the display currency for your portfolio.</p>
@@ -242,26 +324,26 @@
               <option value="GBP">GBP £</option>
             </select>
           </div>
-          <div class="bg-white border border-gray-100 rounded-2xl p-5">
-            <div class="font-semibold mb-3">Theme</div>
-            <p class="text-sm text-gray-600 mb-2">Light/Dark theme preference.</p>
-            <button id="themeToggle2" class="px-4 py-2 border rounded-lg">Toggle Theme</button>
-          </div>
         </div>
+          </div>
         <div class="h-25"></div>
       </section>
     </main>
   </div>
   
+  <!-- =========================== ADD/EDIT STOCK MODAL =========================== -->
 
-  <!-- Add/Edit Stock Modal -->
   <div id="stockModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center z-[60]">
     <div class="bg-white w-full max-w-lg rounded-2xl p-6 border border-gray-100 shadow-xl">
+      <!-- Modal Header -->
       <div class="flex items-center justify-between mb-4">
         <h3 id="modalTitle" class="text-lg font-semibold">Add Stock</h3>
         <button id="closeModal" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center">✕</button>
       </div>
+      
+      <!-- Stock Form -->
       <form id="stockForm" class="grid grid-cols-2 gap-4">
+        <!-- Input Fields Row 1 -->
         <div class="col-span-1">
           <label class="text-sm text-gray-600">Stock Symbol</label>
           <input id="fSymbol" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="AAPL" />
@@ -270,10 +352,14 @@
           <label class="text-sm text-gray-600">Company Name</label>
           <input id="fCompanyInput" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="Apple Inc." />
         </div>
+        
+        <!-- Fetch Details Button -->
         <div class="col-span-2 flex items-center gap-2">
           <button type="button" id="lookupBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Fetch Details</button>
           <span id="lookupStatus" class="text-sm text-success"></span>
         </div>
+        
+        <!-- Auto-filled Information -->
         <div class="col-span-1">
           <label class="text-sm text-gray-600">Company Name</label>
           <input id="fCompany" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 bg-brand-light text-gray-500" readonly />
@@ -290,6 +376,8 @@
           <label class="text-sm text-gray-600">Sector</label>
           <input id="fSector" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 bg-brand-light text-gray-500" readonly />
         </div>
+        
+        <!-- User Input Fields -->
         <div class="col-span-1">
           <label class="text-sm text-gray-600">Quantity</label>
           <input id="fQty" type="number" min="1" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="10" required />
@@ -299,24 +387,31 @@
           <input id="fBuy" type="number" min="0" step="0.01" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="175.50" required />
         </div>
         <div class="col-span-1">
-          <label class="text-sm text-gray-600">Current Price</label>
-          <input id="fCurrent" type="number" min="0" step="0.01" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="180.20" required />
+          <label class="text-sm text-gray-600">Current Price <span class="text-xs text-gray-500">(Auto-fetched)</span></label>
+          <input id="fCurrent" type="number" min="0" step="0.01" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 bg-gray-50" placeholder="Loading..." readonly />
         </div>
         <div class="col-span-1">
           <label class="text-sm text-gray-600">Date</label>
           <input id="fDate" type="date" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" required />
         </div>
+        
+        <!-- Hidden Fields -->
         <input type="hidden" id="editingIndex" value="" />
+        
+        <!-- Modal Actions -->
         <div class="col-span-2 flex items-center justify-end gap-3 mt-2">
+          <button type="button" id="resetModal" class="px-4 py-2 border rounded-lg">Reset</button>
           <button type="button" id="cancelModal" class="px-4 py-2 border rounded-lg">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-brand-blue text-white rounded-lg">Save</button>
+          <button type="submit" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Save</button>
         </div>
       </form>
     </div>
   </div>
-  <!--Push footer down-->
-    <div class="h-40"></div>
+  
+  <!-- Spacer for footer -->
+  <div class="h-40"></div>
 
+  <!-- =========================== FOOTER =========================== -->
   <footer class="mt-10 border-t border-gray-100 py-8 bg-brand-light">
     <div class="max-w-7xl mx-auto px-4 text-sm text-gray-600 flex flex-wrap items-center justify-between gap-4">
       <div>© <span id="year"></span> Predictr — Dashboard</div>
@@ -329,82 +424,181 @@
   </footer>
 
 <script>
-  // ===== Mock currency rates (relative to USD) =====
-  const FX = { USD: 1, EUR: 0.92, GBP: 0.78, INR: 84 };
+  // =========================== GLOBAL VARIABLES AND CONFIGURATION ===========================
+  
+  // Live currency exchange rates (updated from API)
+  let FX = { USD: 1, EUR: 0.92, GBP: 0.78, INR: 84 }; // Default fallback rates
   const DEFAULT_CCY = localStorage.getItem('predictr_ccy') || 'INR';
 
-  // ===== State =====
+  // Application state management
   let state = JSON.parse(localStorage.getItem('predictr_state')||'null') || {
     currency: DEFAULT_CCY,
-    theme: localStorage.getItem('predictr_theme') || 'light',
-    stocks: [
-      { symbol:'AAPL', company:'Apple Inc.', qty:10, buy:150, current:175, date:'2025-01-10' },
-      { symbol:'INFY', company:'Infosys Ltd', qty:20, buy:1450, current:1585, date:'2025-02-01' }
-    ],
-    transactions: [] // auto from stocks add/edit/delete
+    stocks: [],
+    transactions: []
   };
 
-  // ===== Utilities =====
+  // Global variable to store form data between handlers
+  let formDataForServer = null;
+
+  // =========================== UTILITY FUNCTIONS ===========================
+  
+  // DOM helper functions
   const el = sel => document.querySelector(sel);
   const els = sel => Array.from(document.querySelectorAll(sel));
+  // Currency formatting function
   const fmt = (v) => {
     const cur = state.currency;
-    const usd = v; // values are kept in USD-equivalents for simplicity
-    const converted = usd * (cur==='USD'?1:(FX[cur]/FX['USD']));
+    const usd = v;
+    const fxRate = FX[cur] || 1;
+    const converted = usd * fxRate;
     const symbol = cur==='USD'?'$':cur==='EUR'?'€':cur==='GBP'?'£':'₹';
     return symbol + converted.toLocaleString(undefined,{maximumFractionDigits:2});
   };
+  
+  // Currency conversion between different currencies
+  const convertCurrency = (amount, fromCurrency, toCurrency) => {
+    if (fromCurrency === toCurrency) return amount;
+    
+    const fromRate = FX[fromCurrency] || 1;
+    const toRate = FX[toCurrency] || 1;
+    
+    // Convert from source currency to USD first, then to target currency
+    const amountInUSD = amount / fromRate;
+    const amountInTarget = amountInUSD * toRate;
+    
+    return amountInTarget;
+  };
+  
+  // Save application state to localStorage
   const save = () => {
     localStorage.setItem('predictr_state', JSON.stringify(state));
     localStorage.setItem('predictr_ccy', state.currency);
-    localStorage.setItem('predictr_theme', state.theme);
-  };
-  const setTheme = (t) => {
-    state.theme = t; save();
-    document.documentElement.classList.toggle('dark', t==='dark');
-    document.body.style.backgroundColor = t==='dark' ? '#0b1220' : '#ffffff';
-    document.body.style.color = t==='dark' ? '#e5e7eb' : '#242d3a';
-    el('#themeToggle').textContent = t==='dark' ? 'Dark' : 'Light';
   };
 
-  // Keep numbers in a pseudo-USD space to simplify conversion demo
-  const asUSD = (v) => v / (state.currency==='USD'?1:(FX[state.currency]/FX['USD']));
-
-  // ===== Derived metrics =====
+  // =========================== PORTFOLIO CALCULATION FUNCTIONS ===========================
+  
+  // Calculate portfolio totals and metrics
   function totals() {
-    let invested = 0, current = 0;
-    state.stocks.forEach(s => {
-      invested += s.buy * s.qty;
-      current  += s.current * s.qty;
-    });
-    return { invested, current, pl: current - invested, plp: invested? ((current-invested)/invested*100):0 };
+  // Always calculate KPIs in user's default currency (INR) for consistency
+  let invested = 0, current = 0;
+  const baseCurrency = 'INR'; // User's default currency for portfolio calculations
+  const displayCurrency = state.currency; // Currency selected in UI
+  
+  console.log(`💰 KPI Calculation - Base Currency: ${baseCurrency}, Display Currency: ${displayCurrency}`);
+  
+  state.stocks.forEach(s => {
+    const stockCurrency = s.currency || 'USD';
+    const qty = (+s.qty) || 0;
+    const buyPrice = (+s.buy) || 0;
+    const currentPrice = (+s.current) || 0;
+    
+    // Convert stock prices from their native currency to base currency (INR)
+    const buyInINR = convertCurrency(buyPrice, stockCurrency, baseCurrency);
+    const currentInINR = convertCurrency(currentPrice, stockCurrency, baseCurrency);
+    
+    const totalBuyInINR = buyInINR * qty;
+    const totalCurrentInINR = currentInINR * qty;
+    
+    console.log(`💰 ${s.symbol}: ${buyPrice} ${stockCurrency} → ${buyInINR.toFixed(2)} ${baseCurrency} × ${qty} = ${totalBuyInINR.toFixed(2)} ${baseCurrency} invested`);
+    console.log(`💰 ${s.symbol}: ${currentPrice} ${stockCurrency} → ${currentInINR.toFixed(2)} ${baseCurrency} × ${qty} = ${totalCurrentInINR.toFixed(2)} ${baseCurrency} current`);
+    
+    invested += totalBuyInINR;
+    current += totalCurrentInINR;
+  });
+  
+  const pl = current - invested;
+  const plp = invested ? (pl / invested * 100) : 0;
+  
+  console.log(`💰 Portfolio Summary (${baseCurrency}): Invested=${invested.toFixed(2)}, Current=${current.toFixed(2)}, P/L=${pl.toFixed(2)}`);
+  
+  // If display currency is different from base currency, convert for display
+  if (displayCurrency !== baseCurrency) {
+    const investedDisplay = convertCurrency(invested, baseCurrency, displayCurrency);
+    const currentDisplay = convertCurrency(current, baseCurrency, displayCurrency);
+    const plDisplay = currentDisplay - investedDisplay;
+    
+    console.log(`💰 Display Conversion to ${displayCurrency}: Invested=${investedDisplay.toFixed(2)}, Current=${currentDisplay.toFixed(2)}, P/L=${plDisplay.toFixed(2)}`);
+    
+    return { 
+      invested: investedDisplay, 
+      current: currentDisplay, 
+      pl: plDisplay, 
+      plp: plp // Percentage remains the same
+    };
+  }
+  
+  return { invested, current, pl, plp };
+}
+
+  // Refresh all currency-dependent displays when exchange rates update
+  function refreshAllCurrencyDisplays() {
+    console.log('🔄 Refreshing all currency displays with updated rates');
+    renderKPIs();
+    renderStocks();
   }
 
-  // ===== Rendering =====
+  // =========================== UI RENDERING FUNCTIONS ===========================
   function renderKPIs(){
     const t = totals();
-    el('#kpi-invested').textContent = fmt(t.invested);
-    el('#kpi-current').textContent  = fmt(t.current);
-    el('#kpi-pl').textContent       = (t.pl>=0?'+':'') + fmt(Math.abs(t.pl)).replace(/^.[^0-9]/,'');
-    el('#kpi-pl').className = 'text-2xl font-semibold mt-1 ' + (t.pl>=0? 'text-success':'text-danger');
-    el('#kpi-plp').textContent = `${t.plp>=0?'+':''}${t.plp.toFixed(2)}%`;
-    el('#kpi-plp').className = 'text-2xl font-semibold mt-1 ' + (t.plp>=0? 'text-success':'text-danger');
-  }
+    const currencySymbol = state.currency==='USD'?'$':state.currency==='EUR'?'€':state.currency==='GBP'?'£':'₹';
+    
+    el('#kpi-invested').textContent = currencySymbol + t.invested.toLocaleString(undefined,{maximumFractionDigits:2});
+    el('#kpi-current').textContent  = currencySymbol + t.current.toLocaleString(undefined,{maximumFractionDigits:2});
+    el('#kpi-pl').textContent       = (t.pl >= 0 ? '+' : '-') + currencySymbol + Math.abs(t.pl).toLocaleString(undefined,{maximumFractionDigits:2});
+    el('#kpi-pl').className = 'text-2xl font-semibold mt-1 ' + (t.pl>=0?'text-success':'text-danger');
+    el('#kpi-plp').textContent = t.plp.toFixed(2) + '%';
+    el('#kpi-plp').className = 'text-2xl font-semibold mt-1 ' + (t.plp>=0?'text-success':'text-danger');
+    
+    // Update or add currency calculation note
+    const kpiGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.xl\\:grid-cols-4.gap-4');
+    let noteEl = document.getElementById('kpi-currency-note');
+    
+    if (!noteEl && kpiGrid) {
+      noteEl = document.createElement('div');
+      noteEl.id = 'kpi-currency-note';
+      noteEl.className = 'col-span-full text-center text-xs text-gray-500 mt-2';
+      kpiGrid.parentNode.insertBefore(noteEl, kpiGrid.nextSibling);
+    }
+    
+    if (noteEl) {
+      const baseCurrency = 'INR';
+      const displayCurrency = state.currency;
+      
+      if (displayCurrency !== baseCurrency) {
+        noteEl.textContent = `Portfolio calculated in user's default currency (${baseCurrency}), displayed in ${displayCurrency}`;
+      } else {
+        noteEl.textContent = `Portfolio calculated in user's default currency (${baseCurrency})`;
+      }
+    }
+}
+  function renderInfoBlocks(){
+    // Use actual portfolio data instead of hardcoded values
+    const t = totals();
+    const baseCurrency = 'INR';
+    
+    // Convert totals to base currency (INR) for info blocks
+    const investedInINR = state.currency !== baseCurrency ? 
+      convertCurrency(t.invested, state.currency, baseCurrency) : t.invested;
+    const currentInINR = state.currency !== baseCurrency ? 
+      convertCurrency(t.current, state.currency, baseCurrency) : t.current;
+    
+    // Calculate predicted value (could be enhanced with ML model later)
+    const predictedVal = currentInINR * 1.05; // Simple 5% growth prediction
+    
+    el('#info-invested').textContent = fmt(investedInINR);
+    el('#info-predicted').textContent = fmt(predictedVal);
+    el('#info-accuracy').textContent = 'Live Data';  // Updated to reflect real-time nature
+    el('#info-other').textContent = state.stocks.length + ' active positions';
+}
 
+
+  // Render sparkline chart (currently unused but kept for future implementation)
   function renderSparkline(){
-    // Create 7-point spark from current value +/- noise
-    const { current } = totals();
-    const pts = Array.from({length:7}, (_,i)=> current*(0.96 + Math.sin(i)*0.01 + Math.random()*0.02));
-    const max = Math.max(...pts), min = Math.min(...pts);
-    const scaleX = (i)=> 10 + i*(280/6);
-    const scaleY = (v)=> 50 - ((v-min)/(max-min||1))*40;
-    const d = pts.map((p,i)=> `${i===0?'M':'L'} ${scaleX(i)} ${scaleY(p)}`).join(' ');
-    const fill = `${d} L 290 60 L 10 60 Z`;
     const sparkPath = el('#sparkPath');
     const sparkFill = el('#sparkFill');
     if (sparkPath && sparkFill) {
-      sparkPath.setAttribute('d', d);
-      sparkFill.setAttribute('d', fill);
+      sparkPath.setAttribute('d', '');
+      sparkFill.setAttribute('d', '');
     }
   }
 
@@ -412,18 +606,38 @@
     const tbody = el('#stocksTbody');
     tbody.innerHTML = '';
     state.stocks.forEach((s,idx)=>{
-      const pl = (s.current - s.buy) * s.qty;
+      // Stock prices are in their native currency, convert to USD for consistent calculation
+      const currency = s.currency || 'USD';
+      const fxRate = FX[currency] || 1;
+      
+      // Convert stock prices from native currency to USD
+      const buyNative = (+s.buy) || 0;
+      const curNative = (+s.current) || 0;
+      const qty = (+s.qty) || 0;
+      
+      // Convert to USD (stock prices are in native currency, divide by FX rate to get USD)
+      const buyUSD = buyNative / fxRate;
+      const curUSD = curNative / fxRate;
+      
+      // Calculate P/L in USD: (Current Price - Buy Price) × Quantity
+      let plUSD = 0;
+      if (buyNative > 0 && curNative > 0 && qty > 0) {
+        plUSD = (curUSD - buyUSD) * qty;
+      }
+      
+      console.log(`📊 P/L Calculation for ${s.symbol}: (${curUSD.toFixed(2)} - ${buyUSD.toFixed(2)}) × ${qty} = ${plUSD.toFixed(2)} USD`);
+      console.log(`🔍 Raw data for ${s.symbol}: buy=${buyNative} ${currency}, current=${curNative} ${currency}, qty=${qty}`);
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td class="p-3 font-medium">${s.symbol}</td>
         <td class="p-3 text-gray-600">${s.company}</td>
         <td class="p-3 text-right">${s.qty}</td>
-        <td class="p-3 text-right">${fmt(s.buy)}</td>
-        <td class="p-3 text-right">${fmt(s.current)}</td>
-        <td class="p-3 text-right ${pl>=0?'text-success':'text-danger'}">${pl>=0?'+':''}${fmt(Math.abs(pl)).replace(/^.[^0-9]/,'')}</td>
+        <td class="p-3 text-right">${fmt(buyUSD)}</td>
+        <td class="p-3 text-right">${fmt(curUSD)}</td>
+        <td class="p-3 text-right ${plUSD>=0?'text-success':'text-danger'}">${plUSD>=0?'+':''}${fmt(Math.abs(plUSD))}</td>
         <td class="p-3 text-right">
-          <button data-edit="${idx}" class="px-3 py-1.5 text-xs rounded-lg border mr-2 hover:bg-gray-50">Edit</button>
-          <button data-del="${idx}" class="px-3 py-1.5 text-xs rounded-lg border hover:bg-gray-50">Delete</button>
+          <button data-edit="${idx}" class="px-3 py-1.5 text-xs rounded-lg border border-gray-300 mr-2 hover:bg-gray-50 hover:border-gray-400 transition-colors">Edit</button>
+          <button data-del="${idx}" class="px-3 py-1.5 text-xs rounded-lg border border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 transition-colors">Delete</button>
         </td>`;
       tbody.appendChild(tr);
     });
@@ -446,21 +660,17 @@
   }
 
   function renderAll(){
-  renderKPIs();
-  renderSparkline();
-  renderStocks();
-  renderTx();
-  // Update info blocks in prediction section with correct currency
-  const t = totals();
-  el('#info-invested').textContent = fmt(t.invested);
-  // For demo, use current as predicted value
-  el('#info-predicted').textContent = fmt(t.current);
-  el('#info-accuracy').textContent = '—'; // Placeholder, update with real accuracy if available
-  el('#info-other').textContent = '—'; // Placeholder, update with other details if available
-  save();
+     renderKPIs();
+    renderInfoBlocks();   // new
+    renderSparkline();
+    renderStocks();
+    renderTx();
+    save();
   }
 
-  // ===== Navigation =====
+  // =========================== NAVIGATION FUNCTIONS ===========================
+  
+  // Show/hide sections based on navigation selection
   function showSection(id){
     ['overview','mystocks','transactions','settings'].forEach(key=>{
       const sec = el('#section-'+key);
@@ -478,16 +688,26 @@
       a.classList.toggle('shadow', a.dataset.nav===id);
     });
   }
-
   els('.nav-item').forEach(a=> a.addEventListener('click', ()=> showSection(a.dataset.nav)));
 
-  // ===== Modal =====
+  // =========================== MODAL MANAGEMENT FUNCTIONS ===========================
   const openModal = () => { el('#stockModal').classList.remove('hidden'); };
   const closeModal = () => { el('#stockModal').classList.add('hidden'); el('#stockForm').reset(); el('#editingIndex').value=''; el('#modalTitle').textContent='Add Stock'; };
+  el('#resetModal').addEventListener('click', ()=> {
+    el('#stockForm').reset();
+    el('#editingIndex').value='';
+    el('#modalTitle').textContent='Add Stock';
+    el('#lookupStatus').textContent='';
+  });
 
-  el('#openAddModal').addEventListener('click', openModal);
+  el('#openAddModal').addEventListener('click', () => {
+    console.log('🔍 Opening Add Stock modal...');
+    debugFormElements();
+    openModal();
+  });
   el('#closeModal').addEventListener('click', closeModal);
   el('#cancelModal').addEventListener('click', closeModal);
+  
 
   el('#stocksTbody').addEventListener('click', (e)=>{
     const edit = e.target.closest('button[data-edit]');
@@ -508,21 +728,94 @@
     if (del){
       const idx = +del.dataset.del;
       const s = state.stocks[idx];
-      state.transactions.push({ date: new Date().toISOString().slice(0,10), symbol:s.symbol, type:'DELETE', qty:s.qty, price:s.buy, total:s.buy*s.qty });
-      state.stocks.splice(idx,1);
-      renderAll();
+      
+      // Enhanced confirmation dialog with more details
+      const confirmMessage = `⚠️ DELETE STOCK CONFIRMATION ⚠️
+
+Are you sure you want to permanently delete this stock from your portfolio?
+
+Stock: ${s.symbol} (${s.company})
+Quantity: ${s.qty} shares
+Buy Price: ${fmt(s.buy / (FX[s.currency] || 1))}
+Current Value: ${fmt((s.current / (FX[s.currency] || 1)) * s.qty)}
+
+⚠️ This action cannot be undone!
+
+Click OK to delete or Cancel to keep the stock.`;
+      
+      if (confirm(confirmMessage)) {
+        console.log('🗑️ User confirmed deletion of stock:', s.symbol);
+        deleteStockFromServer(s.symbol, idx);
+      } else {
+        console.log('ℹ️ User cancelled deletion of stock:', s.symbol);
+      }
     }
   });
 
   el('#stockForm').addEventListener('submit', (e)=>{
     e.preventDefault();
-    const sym = el('#fSymbol').value.trim().toUpperCase();
-    const com = el('#fCompany').value.trim();
-    const qty = +el('#fQty').value;
-    const buy = +el('#fBuy').value;
-    const cur = +el('#fCurrent').value;
-    const dat = el('#fDate').value;
+    
+    console.log('🚀 Form submission started - checking live values...');
+    
+    // Check live DOM values right now
+    const symbolEl = el('#fSymbol');
+    const liveSymbol = symbolEl ? symbolEl.value : 'ELEMENT_NOT_FOUND';
+    console.log('🔍 Live symbol check: element exists=' + !!symbolEl + ', value="' + liveSymbol + '"');
+    
+    // Get form values
+    const sym = el('#fSymbol').value?.trim().toUpperCase() || '';
+    const com = el('#fCompany').value?.trim() || '';
+    const qty = +el('#fQty').value || 0;
+    const buy = +el('#fBuy').value || 0;
+    const cur = +el('#fCurrent').value || 0;
+    const dat = el('#fDate').value || '';
     const idx = el('#editingIndex').value;
+
+    console.log('📝 Form submit - First handler: sym="' + sym + '", com="' + com + '", qty=' + qty + ', buy=' + buy + ', cur=' + cur + ', dat="' + dat + '", idx="' + idx + '"');
+
+    // Capture form data for the second handler (before any potential form reset)
+    const currency = el('#fCurrency').value?.trim() || 'USD';
+    const exchange = el('#fExchange').value?.trim() || '';
+    const sector = el('#fSector').value?.trim() || '';
+    
+    formDataForServer = {
+      symbol: sym,
+      company: com,
+      qty: qty,
+      buyPrice: buy,
+      currentPrice: cur,
+      date: dat,
+      currency: currency,
+      exchange: exchange,
+      sector: sector,
+      editingIndex: idx  // Capture editing mode
+    };
+    console.log('💾 Captured form data for server persistence:', formDataForServer);
+
+    // Validate required fields
+    if (!sym) {
+      alert('Please enter a stock symbol.');
+      el('#fSymbol').focus();
+      return;
+    }
+    
+    if (!qty || qty <= 0) {
+      alert('Please enter a valid quantity.');
+      el('#fQty').focus();
+      return;
+    }
+    
+    if (!buy || buy <= 0) {
+      alert('Please enter a valid buy price.');
+      el('#fBuy').focus();
+      return;
+    }
+    
+    // Current price is auto-fetched, so we'll allow 0 if API failed
+    if (!cur || cur <= 0) {
+      console.log('⚠️ Current price not available, will use 0 (auto-fetch may have failed)');
+      // Don't block submission, just warn
+    }
 
     if (idx!==""){
       const before = structuredClone(state.stocks[idx]);
@@ -537,6 +830,123 @@
     showSection('mystocks');
   });
 
+  // =========================== STOCK PERSISTENCE FUNCTIONS ===========================
+  
+  // Send saved stock to backend so it persists in MongoDB
+  el('#stockForm').addEventListener('submit', async (e) => {
+    // This second listener runs after the first (above) to persist the record.
+    // Use the captured form data instead of reading from DOM (which might be reset)
+    try {
+      console.log('🔄 Second handler starting - using captured data from first handler');
+      
+      // Use captured data if available, otherwise try to read from DOM
+      const userId = document.body.dataset.userid || document.body.getAttribute('data-userid');
+      let symbol, company, qty, buyPrice, currentPrice, date;
+      
+      if (formDataForServer) {
+        console.log('✅ Using captured form data from first handler');
+        symbol = formDataForServer.symbol;
+        company = formDataForServer.company;
+        qty = formDataForServer.qty;
+        buyPrice = formDataForServer.buyPrice;
+        currentPrice = formDataForServer.currentPrice;
+        date = formDataForServer.date;
+      } else {
+        console.log('⚠️ No captured data, reading from DOM (might be empty if form was reset)');
+        symbol = el('#fSymbol').value?.trim().toUpperCase() || '';
+        company = el('#fCompany').value?.trim() || '';
+        qty = el('#fQty').value || '';
+        buyPrice = el('#fBuy').value || '';
+        currentPrice = el('#fCurrent').value || '';
+        date = el('#fDate').value || '';
+      }
+      
+      console.log('🔍 Debug info - All form fields:');
+      console.log('  userId: "' + userId + '"');
+      console.log('  symbol: "' + symbol + '"');
+      console.log('  company: "' + company + '"');
+      console.log('  qty: "' + qty + '"');
+      console.log('  buyPrice: "' + buyPrice + '"');
+      console.log('  currentPrice: "' + currentPrice + '"');
+      console.log('  date: "' + date + '"');
+      console.log('  fSymbolElement exists: ' + !!el('#fSymbol'));
+      console.log('  fSymbolValue direct: "' + (el('#fSymbol')?.value || '') + '"');
+      
+      if (!userId) {
+        console.error('❌ No user_id found in data-userid attribute');
+        alert('Error: User session not found. Please refresh the page and try again.');
+        return;
+      }
+      
+      if (!symbol) {
+        console.error('❌ No symbol provided - form validation failed');
+        alert('Error: Please enter a stock symbol before saving.');
+        // Focus on the symbol input to help user
+        const symbolInput = el('#fSymbol');
+        if (symbolInput) {
+          symbolInput.focus();
+          symbolInput.style.borderColor = 'red';
+          setTimeout(() => symbolInput.style.borderColor = '', 3000);
+        }
+        return;
+      }
+
+      // Validate required fields
+      if (!qty || !buyPrice || !currentPrice) {
+        console.error('❌ Missing required fields');
+        alert('Error: Please fill in Quantity, Buy Price, and Current Price.');
+        return;
+      }
+
+      const payload = {
+        user_id: userId,
+        symbol: symbol,
+        longName: company,  // Use captured data
+        exchange: formDataForServer?.exchange || undefined,  // Use captured data
+        currency: formDataForServer?.currency || 'USD',  // Use captured data
+        sector: formDataForServer?.sector || undefined,  // Use captured data
+        qty: +qty || 0,  // Use captured data
+        buy: +buyPrice || 0,  // Use captured data
+        current: +currentPrice || 0,  // Use captured data
+        date: date || new Date().toISOString().slice(0,10)  // Use captured data
+      };
+
+      console.log('📤 Sending payload:', payload);
+      
+      // Determine if this is an edit or add operation
+      const isEdit = formDataForServer?.editingIndex !== undefined && formDataForServer?.editingIndex !== "";
+      const apiEndpoint = isEdit ? '/api/stocks/update_stock' : '/api/stocks/add_stock';
+      
+      console.log(isEdit ? '📝 Updating existing stock' : '➕ Adding new stock');
+
+      const res = await fetch(apiEndpoint, {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      console.log(' Server response:', { status: res.status, data });
+      
+      if (res.ok) {
+        console.log(' Saved to server:', data);
+        alert(' Stock saved successfully!');
+        // Clear captured data after successful save
+        formDataForServer = null;
+        console.log(' Cleared captured form data after successful save');
+        // Reload from server to ensure canonical data
+        loadMyStocks();
+      } else {
+        console.warn(' Server save failed', data);
+        alert(' Error saving stock: ' + (data.error || 'Unknown error'));
+        // Keep captured data for potential retry
+      }
+    } catch (err) {
+      console.error(' Could not save stock to server', err);
+      alert(' Network error. Please check your connection and try again.');
+    }
+  });
+
   el('#clearAllBtn').addEventListener('click', ()=>{
     if (confirm('Clear all stocks?')){
       state.transactions.push({ date:new Date().toISOString().slice(0,10), symbol:'*', type:'CLEAR', qty:0, price:0, total:0 });
@@ -545,42 +955,39 @@
     }
   });
 
-  // ===== Prices mock update =====
-  el('#refreshPrices').addEventListener('click', ()=>{
-    state.stocks = state.stocks.map(s=> ({...s, current: +(s.current * (0.98 + Math.random()*0.06)).toFixed(2) }));
-    renderAll();
-  });
+  // Real-time price updates now come from live API calls
 
   // ===== Currency handling =====
-  function setCurrency(ccy){ state.currency = ccy; save(); renderAll(); }
-  ['#currencySelect','#currencySelect2'].forEach(id=>{
-    const sel = el(id); if(!sel) return; sel.value = state.currency; sel.addEventListener('change', ()=> setCurrency(sel.value));
-  });
+  function setCurrency(ccy){
+    console.log(`💱 Currency changed to ${ccy}, using live rates:`, FX);
+    state.currency = ccy;
+    save();
+    renderAll();  // now all values will be updated automatically with live rates
+}
 
-  // ===== Theme handling =====
-  el('#themeToggle').addEventListener('click', ()=> setTheme(state.theme==='light'?'dark':'light'));
-  el('#themeToggle2').addEventListener('click', ()=> setTheme(state.theme==='light'?'dark':'light'));
+['#currencySelect','#currencySelect2'].forEach(id=>{
+    const sel = el(id); 
+    if(!sel) return; 
+    sel.value = state.currency; 
+    sel.addEventListener('change', ()=> setCurrency(sel.value));
+});
 
-  // ===== Mock Stock Database =====
-  const MOCK_STOCKS = {
-    'AAPL': { company: 'Apple Inc.', exchange: 'NASDAQ', currency: 'USD', sector: 'Technology', currentPrice: 175.20 },
-    'TSLA': { company: 'Tesla Inc.', exchange: 'NASDAQ', currency: 'USD', sector: 'Automotive', currentPrice: 248.50 },
-    'GOOGL': { company: 'Alphabet Inc.', exchange: 'NASDAQ', currency: 'USD', sector: 'Technology', currentPrice: 142.80 },
-    'MSFT': { company: 'Microsoft Corporation', exchange: 'NASDAQ', currency: 'USD', sector: 'Technology', currentPrice: 378.90 },
-    'RELIANCE.NS': { company: 'Reliance Industries Ltd', exchange: 'NSE', currency: 'INR', sector: 'Oil & Gas', currentPrice: 2450.75 },
-    'INFY.NS': { company: 'Infosys Limited', exchange: 'NSE', currency: 'INR', sector: 'Information Technology', currentPrice: 1585.30 },
-    'TCS.NS': { company: 'Tata Consultancy Services', exchange: 'NSE', currency: 'INR', sector: 'Information Technology', currentPrice: 3890.50 },
-    'HDFCBANK.NS': { company: 'HDFC Bank Limited', exchange: 'NSE', currency: 'INR', sector: 'Financial Services', currentPrice: 1678.25 },
-    'VOD.L': { company: 'Vodafone Group Plc', exchange: 'LSE', currency: 'GBP', sector: 'Telecommunications', currentPrice: 0.72 },
-    'BP.L': { company: 'BP Plc', exchange: 'LSE', currency: 'GBP', sector: 'Oil & Gas', currentPrice: 4.85 }
-  };
+  
+
+  // All stock data now comes from live API calls - no more mock data
 
   el('#lookupBtn').addEventListener('click', function() {
     let symbol = el('#fSymbol').value.trim().toUpperCase();
     let company = el('#fCompanyInput').value.trim();
     if (symbol) {
+      
+      // --- FIXED ---
+      // Manually trigger the current price fetch
+      fetchCurrentPrice(symbol);
+      // -------------
+
       // Direct symbol lookup
-      fetch(`/fetch_stock_details?symbol=${encodeURIComponent(symbol)}`)
+      fetch(`/api/fetch_stock_details?symbol=${encodeURIComponent(symbol)}`)
         .then(res => res.json())
         .then(data => {
           if (data.error) {
@@ -613,7 +1020,7 @@
       // Search by company name
       el('#lookupStatus').textContent = 'Searching...';
       el('#lookupStatus').className = 'text-sm text-brand-blue';
-      fetch(`/search_company?company=${encodeURIComponent(company)}`)
+      fetch(`/api/search_company?company=${encodeURIComponent(company)}`)
         .then(res => res.json())
         .then(data => {
           if (data.error || !data.results.length) {
@@ -666,13 +1073,1501 @@
     }
   });
 
-  // ===== Init =====
+  // =========================== DEBUG AND UTILITY FUNCTIONS ===========================
+  
+  // Debug function for form elements (development use only)
+  function debugFormElements() {
+    console.log('🔧 Form Elements Debug:');
+    const elements = ['#fSymbol', '#fCompany', '#fQty', '#fBuy', '#fCurrent', '#fDate'];
+    elements.forEach(selector => {
+      const element = el(selector);
+      console.log(`   ${selector}: exists=${!!element}, value="${element?.value || ''}", type="${element?.type || 'undefined'}"`);
+    });
+  }
+
+  // =========================== APPLICATION INITIALIZATION ===========================
+  
+  // Initialize the dashboard application
   (function init(){
+    // Set current year in footer
     document.getElementById('year').textContent = new Date().getFullYear();
-    setTheme(state.theme);
+    
+    // Show default section and render all components
     showSection('overview');
     renderAll();
+    
+    console.log('🚀 Dashboard initialized');
+    console.log('👤 User ID from data attribute:', document.body.dataset.userid);
+    
+    // Set up form event listeners after DOM is loaded
+    setTimeout(() => {
+      const symbolInput = el('#fSymbol');
+      if (symbolInput) {
+        symbolInput.addEventListener('blur', (e) => {
+          const symbol = e.target.value.trim().toUpperCase();
+          if (symbol && symbol.length >= 2) {
+            fetchCurrentPrice(symbol);
+          }
+        });
+      }
+    }, 1000);
   })();
+  // =========================== STOCK SEARCH FUNCTIONALITY ===========================
+  
+  // Alternative querySelector helper
+  const qs = (selector) => document.querySelector(selector);
+
+  // Find the search bar element
+  const searchInput = qs('#stockSearchInput');
+  if (searchInput) {
+    // Create suggestion container
+    const suggestionBox = document.createElement('div');
+    suggestionBox.id = 'searchSuggestions';
+    suggestionBox.className =
+      'absolute bg-white border border-gray-200 rounded-lg shadow-md mt-2 w-full z-50 hidden';
+    searchInput.parentNode.appendChild(suggestionBox);
+
+    // Detect typing in search bar
+    searchInput.addEventListener('input', async (e) => {
+      const query = e.target.value.trim();
+      if (query.length < 2) {
+        suggestionBox.classList.add('hidden');
+        return;
+      }
+
+      try {
+        // Fetch matching stocks from backend
+        const res = await fetch(`/api/search_company?company=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        if (!data.results || !data.results.length) {
+          suggestionBox.innerHTML =
+            `<div class="px-4 py-2 text-gray-500 text-sm">No matches found</div>`;
+          suggestionBox.classList.remove('hidden');
+          return;
+        }
+
+        // Build clickable list of suggestions with Save button
+suggestionBox.innerHTML = data.results
+  .map(
+    (r) => `
+      <div class="flex items-center justify-between px-4 py-2 hover:bg-gray-100 text-sm border-b last:border-0">
+        <div class="cursor-pointer flex-1" data-symbol="${r.symbol}">
+          ${r.symbol} | ${r.shortname || ''} | ${r.exchange || ''}
+        </div>
+        <button 
+          class="save-btn text-brand-blue text-xs font-medium border border-brand-blue rounded px-2 py-1 hover:bg-brand-blue hover:text-white transition"
+          data-save-symbol="${r.symbol}">
+          Save
+        </button>
+      </div>`
+  )
+  .join('');
+        suggestionBox.classList.remove('hidden');
+      } catch (error) {
+        console.error('Error fetching stock list:', error);
+      }
+    });
+
+    // Handle clicks on suggestions or Save buttons
+suggestionBox.addEventListener('click', (e) => {
+  const saveBtn = e.target.closest('[data-save-symbol]');
+  const stockItem = e.target.closest('[data-symbol]');
+
+  // If Save button clicked
+  if (saveBtn) {
+    const symbol = saveBtn.dataset.saveSymbol;
+    suggestionBox.classList.add('hidden');
+
+    // Switch to "My Stocks" section
+    showSection('mystocks');
+
+    // Open modal with symbol pre-filled
+    openModal();
+    el('#fSymbol').value = symbol;
+    el('#lookupBtn').click();
+    return;
+  }
+
+  // If stock name clicked
+  if (stockItem) {
+    const symbol = stockItem.dataset.symbol;
+    searchInput.value = symbol;
+    suggestionBox.classList.add('hidden');
+    qs('#stockSearchBtn').click();
+  }
+});
+  }
+
+ // ===== Search Button Click Handler =====
+const searchBtn = qs('#stockSearchBtn');
+if (searchBtn) {
+  searchBtn.addEventListener('click', async () => {
+    const query = qs('#stockSearchInput').value.trim().toUpperCase();
+    if (!query) return;
+
+    // Hide the action button and suggestion box on every new search
+    qs('#search-actions').classList.add('hidden');
+    const suggestionBox = qs('#searchSuggestions');
+    if (suggestionBox) suggestionBox.classList.add('hidden');
+
+    try {
+      //  Fetch general stock details
+      const res = await fetch(`/api/fetch_stock_details?symbol=${encodeURIComponent(query)}`);
+      const data = await res.json();
+
+      const infoOther = qs('#info-other');
+      const infoInvested = qs('#info-invested');
+      const infoPredicted = qs('#info-predicted');
+
+      if (data.error) {
+        infoOther.textContent = 'Stock not found.';
+        infoInvested.textContent = '—';
+        infoPredicted.textContent = '—';
+        return;
+      }
+
+      //  Show company name
+      infoOther.textContent = `${data.longName || 'N/A'}`;
+
+      // Try to use price from details API
+      let currentPrice = data.currentPrice;
+
+      // If no current price, use fallback API
+      if (!currentPrice) {
+        console.log(` Fallback: fetching current price for ${query}`);
+        const priceRes = await fetch('/api/stocks/get_stock_price', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ symbol: query })
+        });
+        const priceData = await priceRes.json();
+        if (priceRes.ok && priceData.currentPrice) {
+          currentPrice = priceData.currentPrice;
+          console.log(' Got fallback current price:', currentPrice);
+        }
+      }
+
+      //  Update the info blocks
+      infoInvested.textContent = fmt(currentPrice || 0);
+      infoPredicted.textContent = 'Calculating...';
+
+      //  Enable Add buttons
+      const prepareBtn = qs('#prepareAddStockBtn');
+      prepareBtn.dataset.symbol = data.symbol || query;
+      qs('#search-actions').classList.remove('hidden');
+
+      //  Auto-fetch prediction for this stock
+      fetchPrediction(query);
+
+    } catch (err) {
+      console.error('Error fetching stock details:', err);
+      qs('#info-other').textContent = 'Error during search.';
+    }
+  });
+}
+  // ===== Action Button to Open the Add Stock Modal =====
+  const prepareBtn = qs('#prepareAddStockBtn');
+  if (prepareBtn) {
+    prepareBtn.addEventListener('click', function() {
+      const symbol = this.dataset.symbol; // Get the symbol we stored earlier
+      if (!symbol) return;
+
+      //switching section to "My Stocks"
+      showSection('mystocks');
+
+      //Open the "Add Stock" modal 
+      openModal();
+
+      //Pre-fill the stock symbol 
+      el('#fSymbol').value = symbol;
+
+      //Automatically click the "Fetch Details" button 
+      el('#lookupBtn').click();
+    });
+  }
+
+  // =========================== STOCK DATA FUNCTIONS ===========================
+  
+  // Automatically fetch current stock price
+// ===== Stock Prediction Logic (Auto Mode) =====
+
+// Fetch prediction data for a selected stock
+async function fetchPrediction(symbol) {
+  const range = document.getElementById('predictionRange').value;
+  const userId = document.body.dataset.userid;
+
+  if (!symbol || !userId) {
+    console.warn('⚠️ Missing symbol or user ID for prediction');
+    return;
+  }
+
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/stocks/predict', {  
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        symbol: symbol,  // ✅ use the function parameter
+        days: range
+      })
+    });
+
+    // 🔍 Log the raw response for debugging
+    console.log('🔎 Raw response:', response);
+
+    // ✅ Check if server responded successfully
+    if (!response.ok) {
+      const text = await response.text();
+      console.error(' Server returned error:', response.status, text);
+      alert(`Prediction failed: ${text || response.statusText}`);
+      return;
+    }
+
+    //  parse JSON safely
+    let data;
+    try {
+      data = await response.json();
+    } catch (jsonErr) {
+      console.error('Failed to parse JSON:', jsonErr);
+      alert('Error parsing response from server.');
+      return;
+    }
+
+    //  Handle valid JSON response
+    if (data && data.predictions) {
+      console.log(' Prediction data received:', data.predictions);
+      updatePredictionChart(data.predictions);
+
+      // Update info cards
+      document.getElementById('info-predicted').textContent = fmt(data.future_value || 0);
+      document.getElementById('info-accuracy').textContent = `${data.accuracy || 95}%`;
+      document.getElementById('info-other').textContent = `Predicted trend for next ${range} days`;
+    } else {
+      console.warn(' Prediction API returned error:', data.error);
+      alert('Prediction failed: ' + (data.error || 'Unknown error'));
+    }
+
+  } catch (err) {
+    //  Catch true network/CORS issues
+    console.error(' Network or Fetch Error:', err);
+    alert(`Network error while fetching prediction.\n\nDetails: ${err.message}`);
+  }
+}
+
+function updatePredictionChart(predictions) {
+  const ctx = document.getElementById('predictionGraph').getContext('2d');
+
+  // Extract data for the predicted part
+  const predictionDates = predictions.map(p => p.date);
+  const predictedPrices = predictions.map(p => p.price);
+
+  // Destroy previous chart instance if it exists
+  if (window.predChart) {
+    window.predChart.destroy();
+  }
+
+  // Create a new chart
+  window.predChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: predictionDates,
+      datasets: [
+        {
+          label: 'Predicted Prices',
+          data: predictedPrices,
+          borderColor: '#ff8c00',
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 3,
+          fill: false,
+          borderDash: [5, 5]
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom'
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Date'
+          },
+          ticks: {
+            maxRotation: 45,
+            minRotation: 30
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Price'
+          },
+          beginAtZero: false
+        }
+      }
+    }
+  });
+}
+
+
+// ===== Auto-trigger prediction when range OR stock changes =====
+
+// Listen to the new portfolio stock dropdown
+document.getElementById('portfolioStockSelect').addEventListener('change', () => {
+  triggerPortfolioPrediction();
+});
+
+// Update the existing range dropdown listener
+document.getElementById('predictionRange').addEventListener('change', () => {
+  triggerPortfolioPrediction();
+});
+
+// Also run prediction automatically after a successful stock search
+if (qs('#stockSearchBtn')) {
+  qs('#stockSearchBtn').addEventListener('click', async () => {
+    
+  });
+}
+
+// Also run prediction automatically after a successful stock search
+const originalSearchHandler = qs('#stockSearchBtn')?.onclick;
+if (qs('#stockSearchBtn')) {
+  qs('#stockSearchBtn').addEventListener('click', async () => {
+    const symbol = document.getElementById('stockSearchInput').value.trim().toUpperCase();
+    if (symbol) {
+      // Wait a moment for stock details to load, then trigger prediction
+      setTimeout(() => fetchPrediction(symbol), 800);
+    }
+  });
+}
+
+  // ===== Auto-fetch Current Price =====
+  async function fetchCurrentPrice(symbol) {
+    const currentPriceInput = el('#fCurrent');
+    if (!currentPriceInput) return;
+    
+    try {
+      console.log('🔄 Fetching current price for:', symbol);
+      currentPriceInput.value = '';
+      currentPriceInput.placeholder = 'Loading...';
+      
+      const response = await fetch('/api/stocks/get_stock_price', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symbol: symbol })
+      });
+      
+      const data = await response.json();
+      console.log('📈 Price data received:', data);
+      
+      if (response.ok && data.currentPrice) {
+        currentPriceInput.value = parseFloat(data.currentPrice).toFixed(2);
+        currentPriceInput.placeholder = parseFloat(data.currentPrice).toFixed(2);
+        console.log('✅ Set current price to:', data.currentPrice);
+        
+        // Also update company name if available
+        if (data.longName && el('#fCompany')) {
+          el('#fCompany').value = data.longName;
+          console.log('✅ Set company name to:', data.longName);
+        }
+        
+        // Update currency field if available
+        if (data.currency && el('#fCurrency')) {
+          el('#fCurrency').value = data.currency;
+          console.log('✅ Set currency to:', data.currency);
+        }
+        
+        // Show currency hint to user for buy price
+        const buyPriceInput = el('#fBuy');
+        if (buyPriceInput && data.currency) {
+          const currencySymbol = data.currency === 'USD' ? '$' : data.currency === 'EUR' ? '€' : data.currency === 'GBP' ? '£' : '₹';
+          buyPriceInput.placeholder = `Enter price in ${data.currency} (${currencySymbol})`;
+          console.log('💡 Updated buy price placeholder for currency:', data.currency);
+        }
+      } else {
+        currentPriceInput.value = '';
+        currentPriceInput.placeholder = 'Price not found';
+        console.log('❌ Failed to fetch price:', data.error || 'Unknown error');
+      }
+    } catch (error) {
+      console.error('💥 Error fetching price:', error);
+      currentPriceInput.value = '';
+      currentPriceInput.placeholder = 'Error loading price';
+    }
+  }
+
+  // Delete stock from server and update local state
+  async function deleteStockFromServer(symbol, localIndex) {
+    try {
+      const userId = document.body.dataset.userid || document.body.getAttribute('data-userid');
+      
+      if (!userId) {
+        console.error('❌ No user_id found for delete operation');
+        alert('Error: User not authenticated');
+        return;
+      }
+      
+      console.log('🗑️ Deleting stock from server:', symbol);
+      
+      const res = await fetch('/api/stocks/remove_stock', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          user_id: userId,
+          symbol: symbol 
+        })
+      });
+      
+      const data = await res.json();
+      console.log('📥 Delete response:', { status: res.status, data });
+      
+      if (res.ok) {
+        console.log('✅ Stock deleted from server:', symbol);
+        
+        // Update local state
+        const s = state.stocks[localIndex];
+        state.transactions.push({ 
+          date: new Date().toISOString().slice(0,10), 
+          symbol: s.symbol, 
+          type: 'DELETE', 
+          qty: s.qty, 
+          price: s.buy, 
+          total: s.buy * s.qty 
+        });
+        state.stocks.splice(localIndex, 1);
+        
+        renderAll();
+        alert(`✅ SUCCESS: ${symbol} has been permanently deleted from your portfolio!`);
+      } else {
+        console.error('❌ Failed to delete from server:', data);
+        alert(`❌ DELETION FAILED: Could not delete ${symbol} from your portfolio.\n\nError: ${data.error || 'Unknown server error'}\n\nPlease try again or contact support if the issue persists.`);
+      }
+    } catch (error) {
+      console.error('💥 Error deleting stock:', error);
+      alert(`❌ CONNECTION ERROR: Could not delete ${symbol} from your portfolio.\n\nError: ${error.message}\n\nPlease check your internet connection and try again.`);
+    }
+  }
+
+  // =========================== EXCHANGE RATE FUNCTIONS ===========================
+  
+  // Fetch live exchange rates from API
+  async function fetchExchangeRates() {
+    try {
+      console.log('💱 Fetching live exchange rates...');
+      
+      // Show loading state
+      document.getElementById('rate-timestamp').textContent = 'Updating...';
+      
+      // Fetch from backend API which will handle the external API call
+      const response = await fetch('/api/exchange-rates');
+      const data = await response.json();
+      
+      if (response.ok && data.rates) {
+        console.log('✅ Exchange rates received:', data.rates);
+        
+        // Calculate rates from USD to INR, EUR, GBP
+        const usdToInr = data.rates.INR || 84;
+        const usdToEur = data.rates.EUR || 0.92;
+        const usdToGbp = data.rates.GBP || 0.78;
+        
+        // Display USD to INR (1 USD = X INR)
+        document.getElementById('rate-usd').textContent = `₹${usdToInr.toFixed(2)}`;
+        
+        // Display EUR to INR (1 EUR = X INR)
+        const eurToInr = usdToInr / usdToEur;
+        document.getElementById('rate-eur').textContent = `₹${eurToInr.toFixed(2)}`;
+        
+        // Display GBP to INR (1 GBP = X INR)
+        const gbpToInr = usdToInr / usdToGbp;
+        document.getElementById('rate-gbp').textContent = `₹${gbpToInr.toFixed(2)}`;
+        
+        // Update timestamp and status indicator
+        const now = new Date().toLocaleString();
+        document.getElementById('rate-timestamp').textContent = now;
+        document.getElementById('rate-status-indicator').className = 'inline-block w-2 h-2 bg-green-400 rounded-full ml-2';
+        document.getElementById('rate-status-indicator').title = 'Live rates from ExchangeRate-API';
+        
+        // Update the global FX rates used throughout the application
+        FX = {
+          USD: 1,
+          EUR: usdToEur,
+          GBP: usdToGbp,
+          INR: usdToInr
+        };
+        
+        console.log('✅ Updated global FX rates for all conversions:', FX);
+        
+        // Refresh all UI components that use currency conversion
+        refreshAllCurrencyDisplays();
+        
+      } else {
+        console.log('⚠️ Failed to fetch live rates, using default values');
+        document.getElementById('rate-timestamp').textContent = 'Failed to update';
+        
+        // Still update display with default rates
+        document.getElementById('rate-usd').textContent = `₹${FX.INR.toFixed(2)}`;
+        document.getElementById('rate-eur').textContent = `₹${(FX.INR / FX.EUR).toFixed(2)}`;
+        document.getElementById('rate-gbp').textContent = `₹${(FX.INR / FX.GBP).toFixed(2)}`;
+        document.getElementById('rate-status-indicator').className = 'inline-block w-2 h-2 bg-red-400 rounded-full ml-2';
+        document.getElementById('rate-status-indicator').title = 'Using default rates (API failed)';
+      }
+    } catch (error) {
+      console.error('💥 Error fetching exchange rates:', error);
+      document.getElementById('rate-timestamp').textContent = 'Error loading';
+      
+      // Still update display with default rates on error
+      document.getElementById('rate-usd').textContent = `₹${FX.INR.toFixed(2)}`;
+      document.getElementById('rate-eur').textContent = `₹${(FX.INR / FX.EUR).toFixed(2)}`;
+      document.getElementById('rate-gbp').textContent = `₹${(FX.INR / FX.GBP).toFixed(2)}`;
+      document.getElementById('rate-status-indicator').className = 'inline-block w-2 h-2 bg-red-400 rounded-full ml-2';
+      document.getElementById('rate-status-indicator').title = 'Using default rates (Connection error)';
+    }
+  }
+
+  // Load user's stocks from server and update UI
+  async function loadMyStocks() {
+  // Get user_id from multiple sources
+  const userId = document.body.dataset.userid || document.body.getAttribute('data-userid');
+  
+  console.log(' loadMyStocks - userId:', userId);
+  
+  if (!userId) {
+    console.warn(' No user_id found, cannot load stocks');
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/stocks/get_stocks?user_id=${userId}`);
+    const data = await res.json();
+
+    // Normalize server stocks into the client state shape
+    if (data.stocks && Array.isArray(data.stocks)) {
+      state.stocks = data.stocks.map(s => ({
+        symbol: s.symbol,
+        company: s.name || s.longName || s.company || '',
+        qty: s.qty || 0,
+        buy: s.buy_price || s.buy || null,
+        current: s.current_price || s.currentPrice || s.current || null,
+        date: s.date || s.created_at || '',
+        currency: s.currency || 'USD'
+      }));
+      
+      const stockSelect = el('#portfolioStockSelect');
+      if (stockSelect) {
+        stockSelect.innerHTML = '<option value="">-- Select a Stock --</option>'; // Clear it
+        state.stocks.forEach(stock => {
+          stockSelect.innerHTML += `<option value="${stock.symbol}">${stock.symbol}</option>`;
+        });
+        
+        //  auto-load the first stock's prediction
+        if (state.stocks.length > 0) {
+          stockSelect.value = state.stocks[0].symbol;
+          // Trigger the prediction for the first stock
+          triggerPortfolioPrediction();
+        }
+      }
+      // Update UI (table, KPIs)
+      renderAll();
+    }
+
+    // Also populate compact saved-stocks list if present
+    const container = document.getElementById("myStocksList");
+    if (container) {
+      if (!data.stocks || data.stocks.length === 0) {
+        container.innerHTML = `<p class="text-gray-500 text-sm">No saved stocks yet.</p>`;
+      } else {
+        container.innerHTML = data.stocks
+          .map(
+            (s) => `
+            <div class="p-3 border border-gray-200 rounded-lg shadow-sm bg-white flex justify-between items-center">
+              <div>
+                <p class="font-semibold">${s.symbol}</p>
+                <p class="text-sm text-gray-600">${s.name || s.longName || ''} (${s.exchange || ''})</p>
+              </div>
+              <button class="text-red-500 text-sm" onclick="removeStock('${s.symbol}')">Remove</button>
+            </div>`
+          )
+          .join("");
+      }
+    }
+  } catch (error) {
+    console.error("Error loading stocks:", error);
+  }
+}
+
+  // =========================== PAGE INITIALIZATION ===========================
+  
+  // Load data when page opens
+  document.addEventListener("DOMContentLoaded", () => {
+    loadMyStocks();
+    fetchExchangeRates();
+    
+    // Refresh exchange rates every 30 minutes
+    setInterval(fetchExchangeRates, 30 * 60 * 1000);
+  });
+
+  // Save stock to database (Quick Save functionality)
+  const saveBtn = document.getElementById("saveStockBtn");
+if (saveBtn) {
+  saveBtn.addEventListener("click", async () => {
+    const symbol = document.getElementById("stockSearchInput").value.trim();
+    const infoText = document.getElementById("info-other")?.textContent || "";
+
+    if (!symbol) {
+      alert("Please search and select a stock first!");
+      return;
+    }
+
+    // Extract stock info
+    const [longName, exchangeRaw] = infoText.split("(");
+    const exchange = exchangeRaw ? exchangeRaw.replace(")", "").trim() : "—";
+    const userId = document.body.dataset.userid || document.body.getAttribute('data-userid');
+
+    if (!userId) {
+      alert("Error: User session not found. Please refresh the page and try again.");
+      return;
+    }
+
+    const stockData = {
+      user_id: userId,
+      symbol: symbol,
+      longName: longName?.trim() || symbol,
+      exchange: exchange,
+    };
+
+    try {
+      const res = await fetch("/api/stocks/add_stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(stockData),
+      });
+
+      const data = await res.json();
+      if (data.message) {
+        alert(" Stock saved successfully!");
+        loadMyStocks(); // refresh stocks display
+      } else {
+        alert("!! " + (data.error || "Something went wrong."));
+      }
+    } catch (error) {
+      console.error("Error saving stock:", error);
+      alert(" Could not connect to server.");
+    }
+  });
+}
+  // Remove a stock from user's portfolio
+  async function removeStock(symbol) {
+  if (!confirm(`Are you sure you want to remove ${symbol}?`)) {
+    return;
+  }
+
+  const userId = document.body.dataset.userid || document.body.getAttribute('data-userid');
+  if (!userId) {
+    alert("Could not identify user. Please refresh the page and try again.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/stocks/remove_stock", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: userId, symbol: symbol }),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert(" Stock removed successfully!");
+      loadMyStocks(); // Refresh the list from the backend
+    } else {
+      alert(" !! " + (data.error || "Something went wrong."));
+    }
+  } catch (error) {
+    console.error("Error removing stock:", error);
+    alert("Could not connect to the server.");
+  }
+}
+
+  // =========================== AI CHATBOT FUNCTIONALITY ===========================
+  
+  // Chatbot state management
+  let isChatbotOpen = false;
+
+function toggleChatbot() {
+  const chatbot = document.getElementById('chatbot-container');
+  const chatbotIcon = document.getElementById('chatbot-icon');
+  const chatbotClose = document.getElementById('chatbot-close');
+  
+  console.log('Toggle chatbot called');
+  console.log('Chatbot element:', chatbot);
+  console.log('Current state:', isChatbotOpen);
+  
+  if (!chatbot) {
+    console.error('Chatbot container not found!');
+    return;
+  }
+  
+  isChatbotOpen = !isChatbotOpen;
+  
+  if (isChatbotOpen) {
+    // Show chatbot with simple display block
+    chatbot.style.display = 'block';
+    chatbot.style.transform = 'scale(1)';
+    chatbot.style.opacity = '1';
+    chatbot.style.visibility = 'visible';
+    chatbot.style.pointerEvents = 'auto';
+    
+    // Switch icons
+    if (chatbotIcon) chatbotIcon.style.display = 'none';
+    if (chatbotClose) chatbotClose.style.display = 'block';
+    
+    console.log('Chatbot opened - should be visible now');
+    
+    // Focus on input after a short delay
+    setTimeout(() => {
+      const input = document.getElementById('chat-input');
+      if (input) {
+        input.focus();
+        console.log('Input focused');
+      } else {
+        console.error('Chat input not found after opening!');
+      }
+    }, 100);
+    
+  } else {
+    // Hide chatbot
+    chatbot.style.transform = 'scale(0)';
+    chatbot.style.opacity = '0';
+    chatbot.style.pointerEvents = 'none';
+    
+    setTimeout(() => {
+      if (!isChatbotOpen) {
+        chatbot.style.visibility = 'hidden';
+        chatbot.style.display = 'none';
+      }
+    }, 300);
+    
+    // Switch icons
+    if (chatbotIcon) chatbotIcon.style.display = 'block';
+    if (chatbotClose) chatbotClose.style.display = 'none';
+    
+    console.log('Chatbot closed');
+  }
+}
+
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  
+  if (!input) {
+    console.error('Chat input not found');
+    return;
+  }
+  
+  const message = input.value.trim();
+  console.log('Sending message:', message);
+  
+  if (!message) {
+    console.log('Empty message, not sending');
+    return;
+  }
+  
+  // Add user message to chat
+  addMessageToChat(message, 'user');
+  input.value = '';
+  
+  // Show typing indicator
+  showTypingIndicator();
+  
+  // Add timeout message after 15 seconds
+  const timeoutMessage = setTimeout(() => {
+    const typingIndicator = document.getElementById('typing-indicator');
+    if (typingIndicator) {
+      const statusSpan = typingIndicator.querySelector('.text-xs');
+      if (statusSpan) {
+        statusSpan.textContent = 'AI is processing complex analysis, please wait...';
+        statusSpan.classList.add('animate-pulse');
+      }
+    }
+  }, 15000);
+  
+  // Send message to Gemini AI API
+  fetch('/api/ai/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      message: message,
+      currency: state.currency || 'INR'
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    clearTimeout(timeoutMessage);
+    hideTypingIndicator();
+    
+    if (data.success) {
+      // Add AI response to chat
+      addMessageToChat(data.response, 'bot');
+    } else {
+      // Fallback response in case of API error
+      const fallbackResponse = "I apologize, but I'm having trouble processing your request right now. Please try again in a moment, or feel free to ask about portfolio analysis, market trends, or investment strategies.";
+      addMessageToChat(fallbackResponse, 'bot');
+      console.error('AI API Error:', data.error);
+    }
+  })
+  .catch(error => {
+    clearTimeout(timeoutMessage);
+    hideTypingIndicator();
+    console.error('Error calling AI API:', error);
+    
+    // Fallback to professional responses if API fails
+    const professionalResponses = [
+      "📊 I can analyze your portfolio performance and provide optimization insights. What would you like to focus on?",
+      "📈 I specialize in market analysis and technical indicators. What specific area interests you?",
+      "🎯 I help with portfolio rebalancing and growth opportunities. What's your investment timeframe?",
+      "📋 I provide analytics including risk assessment and volatility analysis for your holdings.",
+      "🔍 I offer market intelligence including earnings forecasts and trend analysis.",
+      "⚡ I can perform stock screening and generate recommendations based on your risk profile.",
+      "🏆 My expertise covers trading strategies and investment analysis. How can I help?",
+      "📈 I analyze fundamentals, compare stocks, and track market sentiment. What interests you?"
+    ];
+    
+    // Add some context-aware responses based on message content
+    const userMessage = message.toLowerCase();
+    let response;
+    
+    if (userMessage.includes('portfolio') || userMessage.includes('stocks')) {
+      response = "📊 I can help evaluate your portfolio performance, risk metrics, and suggest optimization strategies. What would you like to analyze?";
+    } else if (userMessage.includes('price') || userMessage.includes('market')) {
+      response = "📈 I provide market analysis, price trends, and technical indicators to support your trading decisions.";
+    } else if (userMessage.includes('help') || userMessage.includes('what')) {
+      response = "🤖 I'm your AI trading assistant. I help with portfolio analysis, market research, risk assessment, and investment strategies.";
+    } else {
+      response = professionalResponses[Math.floor(Math.random() * professionalResponses.length)];
+    }
+    
+    addMessageToChat(response, 'bot');
+  });
+}
+
+function addMessageToChat(message, sender) {
+  const chatMessages = document.getElementById('chat-messages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`;
+  
+  const isUser = sender === 'user';
+  const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  
+  messageDiv.innerHTML = `
+    <div class="max-w-sm ${isUser ? 'ml-8' : 'mr-8'} ${!isUser ? 'ai-message-container' : ''}">
+      ${!isUser ? `
+        <div class="ai-message-header flex items-center space-x-2 mb-2" style="position: relative; top: 0; z-index: 10;">
+          <div class="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg" style="background-color: #10b981 !important;">
+            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" style="color: #ffffff !important;">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              <circle cx="9" cy="9" r="1"/>
+              <circle cx="15" cy="9" r="1"/>
+              <rect x="8" y="13" width="8" height="1" rx="0.5"/>
+            </svg>
+          </div>
+          <span class="text-sm font-bold text-slate-700" style="color: #374151 !important; font-weight: 700 !important;">AI Financial Advisor</span>
+        </div>
+      ` : ''}
+      
+      <div class="px-4 py-3 rounded-2xl shadow-sm ${
+        isUser 
+          ? 'bg-emerald-600 text-white ml-auto' 
+          : 'bg-white border border-slate-200 text-slate-800'
+      }" style="${isUser ? 'background-color: #059669 !important; color: #ffffff !important;' : 'background-color: #ffffff !important; color: #1e293b !important; border: 2px solid #e2e8f0 !important;'}">
+        <p class="text-sm leading-relaxed font-medium" style="${isUser ? 'color: #ffffff !important;' : 'color: #1e293b !important; font-weight: 500 !important;'}">${message}</p>
+        <div class="flex items-center justify-between mt-3">
+          <span class="text-xs font-semibold" style="${isUser ? 'color: #a7f3d0 !important;' : 'color: #64748b !important; font-weight: 600 !important;'}">${timestamp}</span>
+          ${!isUser ? `<div class="flex items-center space-x-1">
+            <div class="w-2 h-2 bg-emerald-500 rounded-full" style="background-color: #10b981 !important;"></div>
+            <span class="text-xs text-slate-600 font-semibold" style="color: #475569 !important; font-weight: 600 !important;">Online</span>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+  
+  chatMessages.appendChild(messageDiv);
+  
+  // Smart scroll behavior - scroll to top for first message, bottom for subsequent
+  setTimeout(() => {
+    const messageCount = chatMessages.children.length;
+    if (messageCount === 1) {
+      // First message - force to top with additional styling
+      chatMessages.scrollTop = 0;
+      
+      // Ensure first message starts from the very top
+      const firstMessage = chatMessages.querySelector('div:first-child');
+      if (firstMessage) {
+        firstMessage.style.marginTop = '0px';
+        firstMessage.style.paddingTop = '0px';
+        firstMessage.style.position = 'relative';
+        firstMessage.style.top = '0px';
+        
+        // Ensure AI header is visible at top
+        const aiHeader = firstMessage.querySelector('.ai-message-header');
+        if (aiHeader) {
+          aiHeader.style.marginTop = '0px';
+          aiHeader.style.paddingTop = '0px';
+          aiHeader.style.position = 'relative';
+          aiHeader.style.top = '0px';
+          aiHeader.style.visibility = 'visible';
+          aiHeader.style.display = 'flex';
+        }
+      }
+      
+      console.log('✅ First message positioned at absolute top');
+    } else {
+      // Subsequent messages - scroll to bottom
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  }, 100);
+}
+
+function showTypingIndicator() {
+  const chatMessages = document.getElementById('chat-messages');
+  const typingDiv = document.createElement('div');
+  typingDiv.id = 'typing-indicator';
+  typingDiv.className = 'flex justify-start mb-4';
+  typingDiv.innerHTML = `
+    <div class="max-w-sm mr-8">
+      <div class="flex items-center space-x-2 mb-2">
+        <div class="w-7 h-7 bg-emerald-500 rounded-xl flex items-center justify-center shadow-md">
+          <svg class="w-4 h-4 text-white animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+            <circle cx="9" cy="9" r="1"/>
+            <circle cx="15" cy="9" r="1"/>
+            <rect x="8" y="13" width="8" height="1" rx="0.5"/>
+          </svg>
+        </div>
+        <span class="text-xs font-semibold text-slate-600">AI is analyzing...</span>
+      </div>
+      
+      <div class="bg-white border border-slate-200 px-4 py-3 rounded-2xl shadow-sm">
+        <div class="flex items-center space-x-3">
+          <div class="flex space-x-1">
+            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
+            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+          </div>
+          <span class="text-xs text-slate-600 font-medium">Processing your financial query...</span>
+        </div>
+      </div>
+    </div>
+  `;
+  chatMessages.appendChild(typingDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function hideTypingIndicator() {
+  const typingIndicator = document.getElementById('typing-indicator');
+  if (typingIndicator) {
+    typingIndicator.remove();
+  }
+}
+
+// Debug function to force open chatbot
+function forceOpenChatbot() {
+  const chatbot = document.getElementById('chatbot-container');
+  if (chatbot) {
+    chatbot.style.display = 'block';
+    chatbot.style.transform = 'scale(1)';
+    chatbot.style.opacity = '1';
+    chatbot.style.visibility = 'visible';
+    chatbot.style.pointerEvents = 'auto';
+    chatbot.style.zIndex = '9999';
+    isChatbotOpen = true;
+    
+    const input = document.getElementById('chat-input');
+    if (input) {
+      input.style.display = 'block';
+      input.style.visibility = 'visible';
+      input.focus();
+      console.log('Forced chatbot open and input focused');
+    }
+  }
+}
+
+// Initialize chatbot with welcome message
+document.addEventListener('DOMContentLoaded', function() {
+  // Debug: Check if elements exist
+  console.log('=== CHATBOT DEBUG INFO ===');
+  console.log('Chatbot container:', document.getElementById('chatbot-container'));
+  console.log('Chatbot icon:', document.getElementById('chatbot-icon'));
+  console.log('Chat input:', document.getElementById('chat-input'));
+  
+  // Add debug button temporarily
+  // const debugBtn = document.createElement('button');
+  // debugBtn.innerText = 'Force Open Chat (Debug)';
+  // debugBtn.style.position = 'fixed';
+  // debugBtn.style.top = '10px';
+  // debugBtn.style.right = '10px';
+  // debugBtn.style.zIndex = '10000';
+  // debugBtn.style.background = 'red';
+  // debugBtn.style.color = 'white';
+  // debugBtn.style.padding = '10px';
+  // debugBtn.onclick = forceOpenChatbot;
+  // document.body.appendChild(debugBtn);
+  
+  // Add welcome message when chatbot opens
+  const originalToggle = window.toggleChatbot;
+  window.toggleChatbot = function() {
+    originalToggle();
+    
+    // Add professional welcome message only when opening for the first time
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages && chatMessages.children.length === 0) {
+      setTimeout(() => {
+        addMessageToChat("Welcome! I'm your AI Financial Advisor. I provide data-driven insights for portfolio analysis, market trends, and investment strategies. Please note: This is for informational purposes only and not personalized financial advice. How may I assist with your financial analysis today?", 'bot');
+        
+        // Force scroll to top and ensure visibility
+        setTimeout(() => {
+          chatMessages.scrollTop = 0;
+          
+          // Ensure all elements are visible
+          const firstMessage = chatMessages.querySelector('div:first-child');
+          if (firstMessage) {
+            firstMessage.style.marginTop = '0px';
+            firstMessage.style.position = 'relative';
+            firstMessage.style.top = '0px';
+            firstMessage.style.visibility = 'visible';
+            firstMessage.style.display = 'flex';
+            
+            const aiHeader = firstMessage.querySelector('.ai-message-header');
+            if (aiHeader) {
+              aiHeader.style.display = 'flex';
+              aiHeader.style.visibility = 'visible';
+              aiHeader.style.position = 'relative';
+              aiHeader.style.top = '0px';
+              aiHeader.style.marginBottom = '8px';
+            }
+          }
+          
+          // Double-check scroll position
+          chatMessages.scrollTop = 0;
+          console.log('✅ Chatbot welcome message positioned at top and fully visible');
+        }, 300);
+      }, 200);
+    }
+  };
+});
+
+// Quick suggestion function
+function quickAsk(question) {
+  const input = document.getElementById('chat-input');
+  input.value = question;
+  sendMessage();
+}
+
+// Handle Enter key in chat input
+document.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter' && document.getElementById('chat-input') === document.activeElement) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// Force input styling and ensure proper chat visibility
+function forceInputStyling() {
+  const input = document.getElementById('chat-input');
+  if (input) {
+    input.style.backgroundColor = '#ffffff';
+    input.style.color = '#000000';
+    input.style.webkitTextFillColor = '#000000';
+    input.style.fontSize = '14px';
+    input.style.fontWeight = '500';
+    input.style.border = '2px solid #d1d5db';
+    console.log('✅ Input styling forced - should be black text on white background');
+  }
+}
+
+// Ensure chat messages are properly visible
+function ensureChatVisibility() {
+  const chatMessages = document.getElementById('chat-messages');
+  if (chatMessages) {
+    // Force container styling
+    chatMessages.style.paddingTop = '24px';
+    chatMessages.style.paddingBottom = '24px';
+    chatMessages.style.overflowY = 'auto';
+    
+    // Reset scroll position to show first message from top
+    chatMessages.scrollTop = 0;
+    
+    // Ensure first message has proper positioning
+    const firstMessage = chatMessages.querySelector('div:first-child');
+    if (firstMessage) {
+      firstMessage.style.marginTop = '0px';
+      firstMessage.style.paddingTop = '0px';
+      firstMessage.style.position = 'relative';
+      firstMessage.style.top = '0px';
+      
+      // Ensure AI header is visible
+      const aiHeader = firstMessage.querySelector('.ai-message-header');
+      if (aiHeader) {
+        aiHeader.style.position = 'relative';
+        aiHeader.style.top = '0px';
+        aiHeader.style.zIndex = '10';
+        aiHeader.style.marginBottom = '8px';
+        aiHeader.style.visibility = 'visible';
+        aiHeader.style.display = 'flex';
+      }
+    }
+    
+    console.log('✅ Chat visibility ensured - AI header and messages should be fully visible');
+  }
+}
+
+// Apply styling when document loads
+document.addEventListener('DOMContentLoaded', forceInputStyling);
+
+// Also apply when chatbot opens
+const originalToggle = window.toggleChatbot;
+if (originalToggle) {
+  window.toggleChatbot = function() {
+    originalToggle();
+    setTimeout(() => {
+      forceInputStyling();
+      ensureChatVisibility();
+    }, 100);
+  };
+}
+// New function to handle portfolio predictions
+function triggerPortfolioPrediction() {
+  const symbol = el('#portfolioStockSelect').value;
+  const range = el('#predictionRange').value;
+  
+  if (symbol) {
+    console.log(`Fetching portfolio prediction for ${symbol}, ${range} days`);
+    fetchPrediction(symbol); // fetchPrediction already reads the range dropdown
+  }
+}
+
 </script>
+
+  <!-- =========================== AI CHATBOT COMPONENT =========================== -->
+  <div class="fixed bottom-6 right-6 z-50">
+    <!-- AI Chat Assistant Container -->
+    <div id="chatbot-container" class="fixed bottom-20 right-4 w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 transform transition-all duration-300 ease-out origin-bottom-right overflow-hidden z-50 flex flex-col" style="display: none; transform: scale(0); opacity: 0; visibility: hidden; pointer-events: none; height: 620px; max-height: 620px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+      
+      <!-- Chatbot Header -->
+      <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-5 py-4 flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              <circle cx="9" cy="9" r="1"/>
+              <circle cx="15" cy="9" r="1"/>
+              <path d="M9 15h6"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-white font-bold text-base">AI Financial Advisor</h3>
+            <div class="flex items-center space-x-2">
+              <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+              <p class="text-slate-300 text-xs font-medium">Online & Ready</p>
+            </div>
+          </div>
+        </div>
+        <button onclick="toggleChatbot()" class="p-2 hover:bg-white/10 rounded-xl transition-colors group">
+          <svg class="w-5 h-5 text-slate-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Investment Disclaimer -->
+      <div class="bg-amber-50 border-b border-amber-200 px-5 py-2 flex-shrink-0" style="position: relative; z-index: 20; display: block !important; visibility: visible !important;">
+        <div class="flex items-start space-x-2">
+          <svg class="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z"/>
+          </svg>
+          <div class="text-xs">
+            <p class="font-semibold text-amber-800" style="color: #92400e !important; font-weight: 600 !important;">Investment Disclaimer</p>
+            <p class="text-amber-700 leading-tight" style="color: #b45309 !important;">AI provides information only. Not financial advice. Consult professionals before investing.</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Chat Messages Container -->
+      <div id="chat-messages" class="flex-1 overflow-y-auto px-4 bg-slate-50" style="min-height: 260px; max-height: 260px; scroll-behavior: smooth; padding-top: 16px; padding-bottom: 16px; position: relative; z-index: 10;">
+        <!-- AI conversation messages will be dynamically added here -->
+      </div>
+      
+      <!-- Quick Action Buttons -->
+      <div class="flex-shrink-0 px-4 py-2 bg-white border-t border-slate-200" style="position: relative; z-index: 15;">
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="quickAsk('Analyze my portfolio performance')" class="px-3 py-1.5 bg-slate-100 hover:bg-emerald-500 hover:text-white rounded-full text-xs font-medium transition-all duration-200 border border-slate-200 hover:border-emerald-500">
+            📊 Portfolio Analysis
+          </button>
+          <button onclick="quickAsk('Current market trends')" class="px-3 py-1.5 bg-slate-100 hover:bg-blue-500 hover:text-white rounded-full text-xs font-medium transition-all duration-200 border border-slate-200 hover:border-blue-500">
+            📈 Market Trends
+          </button>
+          <button onclick="quickAsk('Risk assessment help')" class="px-3 py-1.5 bg-slate-100 hover:bg-orange-500 hover:text-white rounded-full text-xs font-medium transition-all duration-200 border border-slate-200 hover:border-orange-500">
+            ⚖️ Risk Analysis
+          </button>
+        </div>
+      </div>
+      
+      <!-- Chat Input Section -->
+      <div class="flex-shrink-0 p-4 bg-white border-t border-slate-200" style="position: relative; z-index: 15; background-color: #ffffff !important;">
+        <div class="flex space-x-3">
+          <div class="flex-1 relative">
+            <input 
+              id="chat-input" 
+              type="text" 
+              placeholder="Type your financial question here..."
+              class="w-full px-4 py-3 border-2 border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
+              style="background-color: #ffffff !important; color: #1e293b !important; font-size: 14px !important; font-weight: 500 !important; border-color: #cbd5e1 !important; visibility: visible !important; display: block !important;"
+            />
+            <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+          <button 
+            onclick="sendMessage()"
+            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-xl transition-all duration-200 flex-shrink-0 shadow-lg hover:shadow-xl transform hover:scale-105 group"
+            style="visibility: visible !important; display: flex !important; align-items: center !important; justify-content: center !important;"
+          >
+            <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Chatbot Footer -->
+        <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-100" style="visibility: visible !important; display: flex !important;">
+          <div class="flex items-center space-x-2 text-xs text-slate-500" style="visibility: visible !important;">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            <span class="font-medium">Secure</span>
+          </div>
+          <div class="text-xs text-slate-500" style="visibility: visible !important; color: #64748b !important;">
+            <span class="font-semibold" style="color: #64748b !important;">Powered by</span> <span class="text-emerald-600 font-bold" style="color: #059669 !important;">Google Gemini</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  <!-- Modern AI Floating Button -->
+  <button 
+    onclick="toggleChatbot()" 
+    class="fixed bottom-8 right-4 z-40 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-xl transition-all duration-300 group transform hover:scale-105 relative"
+    style="box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);"
+  >
+    <!-- Simple solid background -->
+    <div class="absolute inset-0 rounded-full bg-blue-600"></div>
+    
+    <!-- Main content -->
+    <div class="relative z-10">
+      <!-- Robot Assistant Icon -->
+      <svg id="chatbot-icon" class="w-6 h-6 transition-all duration-300 group-hover:rotate-12" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+        <circle cx="9" cy="9" r="1" fill="white"/>
+        <circle cx="15" cy="9" r="1" fill="white"/>
+        <rect x="8" y="13" width="8" height="2" rx="1" fill="white"/>
+      </svg>
+      
+      <!-- Close Icon -->
+      <svg id="chatbot-close" class="w-6 h-6 hidden transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </div>
+    
+    <!-- AI Activity Indicator -->
+    <div class="absolute -top-1 -right-1 flex">
+      <div class="w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-ping"></div>
+      <div class="w-3 h-3 bg-green-500 rounded-full border-2 border-white absolute"></div>
+    </div>
+    
+    <!-- Floating sparkles -->
+    <div class="absolute -top-2 -left-2 w-1 h-1 bg-white rounded-full animate-ping opacity-70" style="animation-delay: 0.5s;"></div>
+    <div class="absolute -bottom-2 -right-2 w-1 h-1 bg-white rounded-full animate-ping opacity-70" style="animation-delay: 1s;"></div>
+    <div class="absolute top-0 -right-3 w-0.5 h-0.5 bg-blue-200 rounded-full animate-ping opacity-50" style="animation-delay: 1.5s;"></div>
+  </button>
+</div>
+
+<!-- AI Chatbot Styles -->
+<style>
+  /* Chatbot Container */
+  #chatbot-container {
+    z-index: 9999 !important;
+    position: fixed !important;
+  }
+  
+  /* Chat Input Styling - High Specificity */
+  div#chatbot-container #chat-input,
+  #chatbot-container input#chat-input,
+  input[id="chat-input"] {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #d1d5db !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+  
+  div#chatbot-container #chat-input:focus,
+  #chatbot-container input#chat-input:focus,
+  input[id="chat-input"]:focus {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #2563eb !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3) !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+  
+  div#chatbot-container #chat-input::placeholder,
+  #chatbot-container input#chat-input::placeholder,
+  input[id="chat-input"]::placeholder {
+    color: #6b7280 !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #6b7280 !important;
+  }
+  
+  /* Chat messages container - Ensure full visibility */
+  #chat-messages {
+    scroll-padding-top: 16px !important;
+    scroll-padding-bottom: 16px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+    position: relative !important;
+    z-index: 10 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 260px !important;
+    max-height: 260px !important;
+  }
+  
+  /* Ensure all messages are visible starting from the top */
+  #chat-messages > div:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    position: relative !important;
+    top: 0 !important;
+    display: flex !important;
+    visibility: visible !important;
+  }
+  
+  /* Ensure AI avatar and header are always visible at the top */
+  .ai-message-header {
+    position: relative !important;
+    top: 0 !important;
+    margin-bottom: 8px !important;
+    z-index: 15 !important;
+    display: flex !important;
+    visibility: visible !important;
+    align-items: center !important;
+    background-color: transparent !important;
+  }
+  
+  /* Ensure proper visibility for AI messages - start from top */
+  .ai-message-container {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    position: relative !important;
+    display: block !important;
+    visibility: visible !important;
+    z-index: 12 !important;
+  }
+  
+  /* Force disclaimer to stay at the top and be visible */
+  .bg-amber-50 {
+    position: relative !important;
+    z-index: 25 !important;
+    display: block !important;
+    visibility: visible !important;
+    margin: 0 !important;
+    padding: 12px 20px !important;
+    background-color: #fffbeb !important;
+    border-bottom: 1px solid #fbbf24 !important;
+  }
+  
+  /* Ensure disclaimer text is visible */
+  .bg-amber-50 p,
+  .bg-amber-50 span {
+    color: #92400e !important;
+    font-weight: 600 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+  
+  /* Ensure disclaimer icon is visible */
+  .bg-amber-50 svg {
+    color: #d97706 !important;
+    visibility: visible !important;
+  }
+  
+  /* Ensure the entire chatbot container layout is proper */
+  #chatbot-container {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 620px !important;
+    max-height: 620px !important;
+    overflow: hidden !important;
+  }
+  
+  /* Scrollbar for chat messages */
+  #chat-messages::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  #chat-messages::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  
+  #chat-messages::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+  
+  #chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+  
+  /* User message bubble styling */
+  .user-message-bubble {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+  }
+  
+  .user-message-bubble p {
+    color: #ffffff !important;
+  }
+  
+  .user-message-bubble span {
+    color: #dbeafe !important;
+  }
+  
+  /* Bot message bubble styling */
+  .bot-message-bubble {
+    background-color: #ffffff !important;
+    color: #1f2937 !important;
+    border: 1px solid #e5e7eb !important;
+  }
+  
+  .bot-message-bubble p {
+    color: #1f2937 !important;
+  }
+</style>
+
 </body>
 </html>
