@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 import os
 import sys
 from flask import Blueprint
+from flask_cors import CORS
+
 
 # Add the project root to Python path
 project_root = os.path.dirname(os.path.dirname(__file__))
@@ -12,6 +14,9 @@ if project_root not in sys.path:
 from backend_process.extensions import mail
 from backend_process.routes.FetchStock import fetch_stock
 from backend_process.routes.StockRoutes import stock_routes
+from .train_model import train_lstm_model
+from .predict_stock import predict_stock_price
+from backend_process.routes.predict_route import predict_bp
 
 
 load_dotenv()
@@ -21,6 +26,7 @@ app = Flask(
     template_folder=os.path.join(os.path.dirname(__file__), '..', 'public-pages'),
     static_folder=os.path.join(os.path.dirname(__file__), '..', 'static')
 )
+CORS(app)
 
 app.secret_key = os.getenv("SECRET_KEY")
 
@@ -43,6 +49,8 @@ app.register_blueprint(otp, url_prefix='/otp')
 app.register_blueprint(fetch_stock, url_prefix='/api')
 app.register_blueprint(stock_routes, url_prefix="/api")
 app.register_blueprint(gemini_bp, url_prefix="/api")
+app.register_blueprint(predict_bp)
+
 
 # page routes to frontend 
 @app.route('/')
@@ -84,6 +92,12 @@ app.register_blueprint(dashboard, url_prefix='/dashboard')
 @app.route("/contact")
 def contact():
     return render_template("contact.html")
+
+
+@app.route("/api/stocks/predict", methods=["POST"])
+def predict_stock(symbol):
+    return predict_stock(symbol)
+
 
 # Run app
 if __name__ == "__main__":

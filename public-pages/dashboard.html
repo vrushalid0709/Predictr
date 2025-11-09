@@ -35,11 +35,15 @@
     .card-hover { transition: all .25s cubic-bezier(.4,0,.2,1); }
     .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(36,45,58,.08); }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../static/js/dashboard.js"></script>
+
 </head>
 <body class="bg-white text-brand-navy antialiased" data-userid="{{ user_id }}">
 
   <!-- =========================== NAVIGATION BAR =========================== -->
   <nav class="fixed top-0 inset-x-0 bg-white/95 border-gray-100 backdrop-blur z-50">
+  <nav class="fixed top-0 inset-x-0 bg-white/95  border-gray-100 backdrop-blur z-50">
     <div class="max-w-7xl mx-auto px-4">
       <div class="h-16 flex items-center justify-between">
         <!-- Left Section: Logo and Brand -->
@@ -53,6 +57,7 @@
         </div>
         
         <!-- Right Section: Currency Selector and User Info -->
+          </div>
         <div class="flex items-center gap-3">
           <div class="hidden sm:flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
             <span class="text-xs text-gray-500">Currency</span>
@@ -121,6 +126,8 @@
       <!-- =========================== PORTFOLIO OVERVIEW SECTION =========================== -->
       <section id="section-overview">
         <!-- Section Header -->
+    <main class="col-span-12 md:col-span-9 lg:col-span-10 space-y-6 pb-16">
+      <section id="section-overview">
         <div class="flex items-center justify-between">
           <h1 class="text-2xl md:text-3xl font-bold">Portfolio Overview</h1>
           <div class="text-sm text-gray-500">Live data from APIs & Database</div>
@@ -173,6 +180,41 @@
             </div>
             <div class="mt-2 text-xs text-gray-500">Scroll or select range to view predictions for next n days/months/years.</div>
           </div>
+        <div class="relative bg-white border border-gray-100 rounded-2xl p-5 mt-6 flex items-center gap-3">
+  <input id="stockSearchInput" type="text" class="border border-gray-200 rounded-lg px-4 py-2 w-full" placeholder="Search your stocks by symbol or name..." />
+  <button id="stockSearchBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Search</button>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-5 gap-6 mt-6">
+
+ <div class="col-span-2 bg-white border border-gray-100 rounded-2xl p-5 flex flex-col">
+  <div class="flex items-center justify-between mb-2">
+    <div class="font-semibold">My Stock Predictions</div>
+    <div class="flex items-center gap-2">
+      <label for="portfolioStockSelect" class="text-xs text-gray-500">Stock:</label>
+      <select id="portfolioStockSelect" class="border border-gray-200 rounded-lg px-2 py-1 text-xs">
+        <option value="">-- Select a Stock --</option>
+      </select>
+      <label for="predictionRange" class="text-xs text-gray-500">Range:</label>
+      <select id="predictionRange" class="border border-gray-200 rounded-lg px-2 py-1 text-xs">
+        <option value="7">7 Days</option>
+        <option value="30">1 Month</option>
+        <option value="90">3 Months</option>
+        <option value="365">1 Year</option>
+      </select>
+    </div>
+  </div>
+  
+  <div class="flex-1 flex items-center justify-center">
+   <canvas id="predictionGraph" class="w-full h-80"></canvas>
+
+  </div>
+
+  <div class="mt-2 text-xs text-gray-500">
+    Scroll or select range to view predictions for next n days/months/years.
+  </div>
+</div>
+
 
           <!-- Stock Information Cards -->
           <div class="col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
@@ -209,6 +251,8 @@
       <!-- =========================== MY STOCKS SECTION =========================== -->
       <section id="section-mystocks" class="hidden">
         <!-- Section Header -->
+
+      <section id="section-mystocks" class="hidden">
         <div class="flex items-center justify-between">
           <h2 class="text-xl md:text-2xl font-bold">My Stocks</h2>
           <div class="flex items-center gap-2">
@@ -239,6 +283,9 @@
       <!-- =========================== TRANSACTIONS SECTION =========================== -->
       <section id="section-transactions" class="hidden">
         <!-- Section Header -->
+      
+
+      <section id="section-transactions" class="hidden">
         <div class="flex items-center justify-between">
           <h2 class="text-xl md:text-2xl font-bold">Transactions</h2>
           <div class="text-sm text-gray-500">Auto-generated from your buys/sells</div>
@@ -278,11 +325,14 @@
             </select>
           </div>
         </div>
+          </div>
+        <div class="h-25"></div>
       </section>
     </main>
   </div>
   
   <!-- =========================== ADD/EDIT STOCK MODAL =========================== -->
+
   <div id="stockModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center z-[60]">
     <div class="bg-white w-full max-w-lg rounded-2xl p-6 border border-gray-100 shadow-xl">
       <!-- Modal Header -->
@@ -876,24 +926,24 @@ Click OK to delete or Cancel to keep the stock.`;
       });
 
       const data = await res.json();
-      console.log('📥 Server response:', { status: res.status, data });
+      console.log(' Server response:', { status: res.status, data });
       
       if (res.ok) {
-        console.log('✅ Saved to server:', data);
-        alert('✅ Stock saved successfully!');
+        console.log(' Saved to server:', data);
+        alert(' Stock saved successfully!');
         // Clear captured data after successful save
         formDataForServer = null;
-        console.log('🧹 Cleared captured form data after successful save');
+        console.log(' Cleared captured form data after successful save');
         // Reload from server to ensure canonical data
         loadMyStocks();
       } else {
-        console.warn('❌ Server save failed', data);
-        alert('❌ Error saving stock: ' + (data.error || 'Unknown error'));
+        console.warn(' Server save failed', data);
+        alert(' Error saving stock: ' + (data.error || 'Unknown error'));
         // Keep captured data for potential retry
       }
     } catch (err) {
-      console.error('❌ Could not save stock to server', err);
-      alert('❌ Network error. Please check your connection and try again.');
+      console.error(' Could not save stock to server', err);
+      alert(' Network error. Please check your connection and try again.');
     }
   });
 
@@ -930,6 +980,12 @@ Click OK to delete or Cancel to keep the stock.`;
     let symbol = el('#fSymbol').value.trim().toUpperCase();
     let company = el('#fCompanyInput').value.trim();
     if (symbol) {
+      
+      // --- FIXED ---
+      // Manually trigger the current price fetch
+      fetchCurrentPrice(symbol);
+      // -------------
+
       // Direct symbol lookup
       fetch(`/api/fetch_stock_details?symbol=${encodeURIComponent(symbol)}`)
         .then(res => res.json())
@@ -1143,48 +1199,73 @@ suggestionBox.addEventListener('click', (e) => {
 });
   }
 
-  // ===== Search Button Click Handler =====
-  const searchBtn = qs('#stockSearchBtn');
-  if (searchBtn) {
-    searchBtn.addEventListener('click', () => {
-      const query = qs('#stockSearchInput').value.trim().toUpperCase();
-      if (!query) return;
+ // ===== Search Button Click Handler =====
+const searchBtn = qs('#stockSearchBtn');
+if (searchBtn) {
+  searchBtn.addEventListener('click', async () => {
+    const query = qs('#stockSearchInput').value.trim().toUpperCase();
+    if (!query) return;
 
-      // Hide the action button and suggestion box on every new search
-      qs('#search-actions').classList.add('hidden');
-      const suggestionBox = qs('#searchSuggestions');
-      if (suggestionBox) suggestionBox.classList.add('hidden');
+    // Hide the action button and suggestion box on every new search
+    qs('#search-actions').classList.add('hidden');
+    const suggestionBox = qs('#searchSuggestions');
+    if (suggestionBox) suggestionBox.classList.add('hidden');
 
-      // Fetch the stock details from your backend API
-      fetch(`/api/fetch_stock_details?symbol=${encodeURIComponent(query)}`)
-        .then((res) => res.json())
-        .then((data) => {
-          const infoOther = qs('#info-other');
-          const infoInvested = qs('#info-invested');
-          const infoPredicted = qs('#info-predicted');
+    try {
+      //  Fetch general stock details
+      const res = await fetch(`/api/fetch_stock_details?symbol=${encodeURIComponent(query)}`);
+      const data = await res.json();
 
-          if (data.error) {
-            infoOther.textContent = 'Stock not found.';
-            infoInvested.textContent = '—';
-            infoPredicted.textContent = '—';
-          } else {
-            // Update the blocks 
-            infoOther.textContent = `${data.longName || 'N/A'}`;
-            infoInvested.textContent = fmt(data.currentPrice || 0); 
-            infoPredicted.textContent = 'Calculating...'; 
-            // add stock button 
-            const prepareBtn = qs('#prepareAddStockBtn');
-            prepareBtn.dataset.symbol = data.symbol; 
-            qs('#search-actions').classList.remove('hidden'); 
-          }
-        })
-        .catch((err) => {
-            console.error('Error fetching details:', err);
-            qs('#info-other').textContent = 'Error during search.';
+      const infoOther = qs('#info-other');
+      const infoInvested = qs('#info-invested');
+      const infoPredicted = qs('#info-predicted');
+
+      if (data.error) {
+        infoOther.textContent = 'Stock not found.';
+        infoInvested.textContent = '—';
+        infoPredicted.textContent = '—';
+        return;
+      }
+
+      //  Show company name
+      infoOther.textContent = `${data.longName || 'N/A'}`;
+
+      // Try to use price from details API
+      let currentPrice = data.currentPrice;
+
+      // If no current price, use fallback API
+      if (!currentPrice) {
+        console.log(` Fallback: fetching current price for ${query}`);
+        const priceRes = await fetch('/api/stocks/get_stock_price', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ symbol: query })
         });
-    });
-  }
+        const priceData = await priceRes.json();
+        if (priceRes.ok && priceData.currentPrice) {
+          currentPrice = priceData.currentPrice;
+          console.log(' Got fallback current price:', currentPrice);
+        }
+      }
 
+      //  Update the info blocks
+      infoInvested.textContent = fmt(currentPrice || 0);
+      infoPredicted.textContent = 'Calculating...';
+
+      //  Enable Add buttons
+      const prepareBtn = qs('#prepareAddStockBtn');
+      prepareBtn.dataset.symbol = data.symbol || query;
+      qs('#search-actions').classList.remove('hidden');
+
+      //  Auto-fetch prediction for this stock
+      fetchPrediction(query);
+
+    } catch (err) {
+      console.error('Error fetching stock details:', err);
+      qs('#info-other').textContent = 'Error during search.';
+    }
+  });
+}
   // ===== Action Button to Open the Add Stock Modal =====
   const prepareBtn = qs('#prepareAddStockBtn');
   if (prepareBtn) {
@@ -1209,6 +1290,169 @@ suggestionBox.addEventListener('click', (e) => {
   // =========================== STOCK DATA FUNCTIONS ===========================
   
   // Automatically fetch current stock price
+// ===== Stock Prediction Logic (Auto Mode) =====
+
+// Fetch prediction data for a selected stock
+async function fetchPrediction(symbol) {
+  const range = document.getElementById('predictionRange').value;
+  const userId = document.body.dataset.userid;
+
+  if (!symbol || !userId) {
+    console.warn('⚠️ Missing symbol or user ID for prediction');
+    return;
+  }
+
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/stocks/predict', {  
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        symbol: symbol,  // ✅ use the function parameter
+        days: range
+      })
+    });
+
+    // 🔍 Log the raw response for debugging
+    console.log('🔎 Raw response:', response);
+
+    // ✅ Check if server responded successfully
+    if (!response.ok) {
+      const text = await response.text();
+      console.error(' Server returned error:', response.status, text);
+      alert(`Prediction failed: ${text || response.statusText}`);
+      return;
+    }
+
+    //  parse JSON safely
+    let data;
+    try {
+      data = await response.json();
+    } catch (jsonErr) {
+      console.error('Failed to parse JSON:', jsonErr);
+      alert('Error parsing response from server.');
+      return;
+    }
+
+    //  Handle valid JSON response
+    if (data && data.predictions) {
+      console.log(' Prediction data received:', data.predictions);
+      updatePredictionChart(data.predictions);
+
+      // Update info cards
+      document.getElementById('info-predicted').textContent = fmt(data.future_value || 0);
+      document.getElementById('info-accuracy').textContent = `${data.accuracy || 95}%`;
+      document.getElementById('info-other').textContent = `Predicted trend for next ${range} days`;
+    } else {
+      console.warn(' Prediction API returned error:', data.error);
+      alert('Prediction failed: ' + (data.error || 'Unknown error'));
+    }
+
+  } catch (err) {
+    //  Catch true network/CORS issues
+    console.error(' Network or Fetch Error:', err);
+    alert(`Network error while fetching prediction.\n\nDetails: ${err.message}`);
+  }
+}
+
+function updatePredictionChart(predictions) {
+  const ctx = document.getElementById('predictionGraph').getContext('2d');
+
+  // Extract data for the predicted part
+  const predictionDates = predictions.map(p => p.date);
+  const predictedPrices = predictions.map(p => p.price);
+
+  // Destroy previous chart instance if it exists
+  if (window.predChart) {
+    window.predChart.destroy();
+  }
+
+  // Create a new chart
+  window.predChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: predictionDates,
+      datasets: [
+        {
+          label: 'Predicted Prices',
+          data: predictedPrices,
+          borderColor: '#ff8c00',
+          borderWidth: 2,
+          tension: 0.3,
+          pointRadius: 3,
+          fill: false,
+          borderDash: [5, 5]
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom'
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Date'
+          },
+          ticks: {
+            maxRotation: 45,
+            minRotation: 30
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Price'
+          },
+          beginAtZero: false
+        }
+      }
+    }
+  });
+}
+
+
+// ===== Auto-trigger prediction when range OR stock changes =====
+
+// Listen to the new portfolio stock dropdown
+document.getElementById('portfolioStockSelect').addEventListener('change', () => {
+  triggerPortfolioPrediction();
+});
+
+// Update the existing range dropdown listener
+document.getElementById('predictionRange').addEventListener('change', () => {
+  triggerPortfolioPrediction();
+});
+
+// Also run prediction automatically after a successful stock search
+if (qs('#stockSearchBtn')) {
+  qs('#stockSearchBtn').addEventListener('click', async () => {
+    
+  });
+}
+
+// Also run prediction automatically after a successful stock search
+const originalSearchHandler = qs('#stockSearchBtn')?.onclick;
+if (qs('#stockSearchBtn')) {
+  qs('#stockSearchBtn').addEventListener('click', async () => {
+    const symbol = document.getElementById('stockSearchInput').value.trim().toUpperCase();
+    if (symbol) {
+      // Wait a moment for stock details to load, then trigger prediction
+      setTimeout(() => fetchPrediction(symbol), 800);
+    }
+  });
+}
+
+  // ===== Auto-fetch Current Price =====
   async function fetchCurrentPrice(symbol) {
     const currentPriceInput = el('#fCurrent');
     if (!currentPriceInput) return;
@@ -1396,10 +1640,10 @@ suggestionBox.addEventListener('click', (e) => {
   // Get user_id from multiple sources
   const userId = document.body.dataset.userid || document.body.getAttribute('data-userid');
   
-  console.log('🔍 loadMyStocks - userId:', userId);
+  console.log(' loadMyStocks - userId:', userId);
   
   if (!userId) {
-    console.warn('⚠️ No user_id found, cannot load stocks');
+    console.warn(' No user_id found, cannot load stocks');
     return;
   }
 
@@ -1418,6 +1662,21 @@ suggestionBox.addEventListener('click', (e) => {
         date: s.date || s.created_at || '',
         currency: s.currency || 'USD'
       }));
+      
+      const stockSelect = el('#portfolioStockSelect');
+      if (stockSelect) {
+        stockSelect.innerHTML = '<option value="">-- Select a Stock --</option>'; // Clear it
+        state.stocks.forEach(stock => {
+          stockSelect.innerHTML += `<option value="${stock.symbol}">${stock.symbol}</option>`;
+        });
+        
+        //  auto-load the first stock's prediction
+        if (state.stocks.length > 0) {
+          stockSelect.value = state.stocks[0].symbol;
+          // Trigger the prediction for the first stock
+          triggerPortfolioPrediction();
+        }
+      }
       // Update UI (table, KPIs)
       renderAll();
     }
@@ -1496,14 +1755,14 @@ if (saveBtn) {
 
       const data = await res.json();
       if (data.message) {
-        alert("✅ Stock saved successfully!");
+        alert(" Stock saved successfully!");
         loadMyStocks(); // refresh stocks display
       } else {
-        alert("⚠️ " + (data.error || "Something went wrong."));
+        alert("!! " + (data.error || "Something went wrong."));
       }
     } catch (error) {
       console.error("Error saving stock:", error);
-      alert("⚠️ Could not connect to server.");
+      alert(" Could not connect to server.");
     }
   });
 }
@@ -1987,6 +2246,17 @@ if (originalToggle) {
     }, 100);
   };
 }
+// New function to handle portfolio predictions
+function triggerPortfolioPrediction() {
+  const symbol = el('#portfolioStockSelect').value;
+  const range = el('#predictionRange').value;
+  
+  if (symbol) {
+    console.log(`Fetching portfolio prediction for ${symbol}, ${range} days`);
+    fetchPrediction(symbol); // fetchPrediction already reads the range dropdown
+  }
+}
+
 </script>
 
   <!-- =========================== AI CHATBOT COMPONENT =========================== -->
