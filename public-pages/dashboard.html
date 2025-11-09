@@ -4,7 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Predictr — User Dashboard</title>
+  
+  <!-- Tailwind CSS Framework -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
+  <!-- Custom Brand Colors Configuration -->
   <script>
     tailwind = {
       config: {
@@ -24,29 +28,31 @@
       }
     }
   </script>
+  
+  <!-- Custom Styles and Animations -->
   <style>
     * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    .fade-up { opacity: 0; transform: translateY(12px); animation: fadeUp .5s ease-out forwards; }
-    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
     .card-hover { transition: all .25s cubic-bezier(.4,0,.2,1); }
     .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(36,45,58,.08); }
-    .gradient-text { background: linear-gradient(45deg,#387ef5,#00c851); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
   </style>
 </head>
 <body class="bg-white text-brand-navy antialiased" data-userid="{{ user_id }}">
 
-  <!-- Top Nav -->
-  <nav class="fixed top-0 inset-x-0 bg-white/95  border-gray-100 backdrop-blur z-50">
+  <!-- =========================== NAVIGATION BAR =========================== -->
+  <nav class="fixed top-0 inset-x-0 bg-white/95 border-gray-100 backdrop-blur z-50">
     <div class="max-w-7xl mx-auto px-4">
       <div class="h-16 flex items-center justify-between">
+        <!-- Left Section: Logo and Brand -->
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 bg-brand-blue rounded-lg flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+            </svg>
           </div>
-          <!--Add Company Logo-->
           <img src="{{ url_for('static', filename='assets/logo_file/svg/color-logo.svg') }}" class="w-30 h-30 rounded-lg" alt="Company Logo"/>
-          <!-- <span class="text-lg font-semibold">Predictr Dashboard</span> -->
         </div>
+        
+        <!-- Right Section: Currency Selector and User Info -->
         <div class="flex items-center gap-3">
           <div class="hidden sm:flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
             <span class="text-xs text-gray-500">Currency</span>
@@ -57,27 +63,28 @@
               <option value="GBP">GBP £</option>
             </select>
           </div>
-          <!--Theme Toggle-->
-          <!-- <button id="themeToggle" class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm hover:bg-gray-50">Light</button> -->
           <div class="flex items-center gap-2">
-          <img src="{{ url_for('static', filename='assets/elements/user.png') }}" class="w-8 h-8 rounded-full" alt="avatar"/>
-         <span class="hidden sm:block text-sm font-medium">Hi, {{ user_name }}</span>
-         </div>
+            <img src="{{ url_for('static', filename='assets/elements/user.png') }}" class="w-8 h-8 rounded-full" alt="avatar"/>
+            <span class="hidden sm:block text-sm font-medium">Hi, {{ user_name }}</span>
+          </div>
         </div>
       </div>
     </div>
   </nav>
 
+  <!-- =========================== MAIN LAYOUT =========================== -->
   <div class="pt-20 max-w-7xl mx-auto px-4 grid grid-cols-12 gap-6">
-    <!-- Sidebar -->
+    
+    <!-- =========================== SIDEBAR =========================== -->
     <aside class="col-span-12 md:col-span-3 lg:col-span-2">
       <div class="bg-brand-light border border-gray-100 rounded-2xl p-3 md:p-4 sticky top-24">
+        <!-- Navigation Menu -->
         <a data-nav="overview" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover bg-white shadow">Overview</a>
         <a data-nav="mystocks" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">My Stocks</a>
         <a data-nav="transactions" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">Transactions</a>
         <a data-nav="settings" class="nav-item block px-4 py-2.5 rounded-xl font-medium hover:bg-white hover:shadow card-hover mt-2">Settings</a>
         
-        <!-- Exchange Rates Box -->
+        <!-- Live Exchange Rates Widget -->
         <div class="mt-6 p-3 bg-white rounded-xl shadow-sm">
           <h3 class="text-sm font-semibold text-gray-700 mb-3">
             Live Exchange Rates
@@ -108,16 +115,19 @@
       </div>
     </aside>
 
-    <!-- Main -->
+    <!-- =========================== MAIN CONTENT =========================== -->
     <main class="col-span-12 md:col-span-9 lg:col-span-10 space-y-6 pb-16">
-      <!-- Overview -->
-  <section id="section-overview">
+      
+      <!-- =========================== PORTFOLIO OVERVIEW SECTION =========================== -->
+      <section id="section-overview">
+        <!-- Section Header -->
         <div class="flex items-center justify-between">
           <h1 class="text-2xl md:text-3xl font-bold">Portfolio Overview</h1>
           <div class="text-sm text-gray-500">Live data from APIs & Database</div>
         </div>
+        
+        <!-- KPI Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
-          <!-- Cards -->
           <div class="bg-white border border-gray-100 rounded-2xl p-5 card-hover">
             <div class="text-sm text-gray-500">Total Invested</div>
             <div id="kpi-invested" class="text-2xl font-semibold mt-1">₹0</div>
@@ -136,85 +146,69 @@
           </div>
         </div>
 
-        <!-- Mini chart (static SVG sparkline based on data) -->
-        <!-- <div class="bg-white border border-gray-100 rounded-2xl p-5 mt-4">
-          <div class="flex items-center justify-between mb-2">
-            <div class="font-semibold">Portfolio Sparkline</div>
-            <div class="text-xs text-gray-500">Last 7 points</div>
+        <!-- Stock Search Bar -->
+        <div class="relative bg-white border border-gray-100 rounded-2xl p-5 mt-6 flex items-center gap-3">
+          <input id="stockSearchInput" type="text" class="border border-gray-200 rounded-lg px-4 py-2 w-full" placeholder="Search your stocks by symbol or name..." />
+          <button id="stockSearchBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Search</button>
+        </div>
+
+        <!-- Stock Analysis Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mt-6">
+          <!-- Prediction Graph Panel -->
+          <div class="col-span-2 bg-white border border-gray-100 rounded-2xl p-5 flex flex-col">
+            <div class="flex items-center justify-between mb-2">
+              <div class="font-semibold">Stock Prediction Graph</div>
+              <div class="flex items-center gap-2">
+                <label for="predictionRange" class="text-xs text-gray-500">Range:</label>
+                <select id="predictionRange" class="border border-gray-200 rounded-lg px-2 py-1 text-xs">
+                  <option value="7">7 Days</option>
+                  <option value="30">1 Month</option>
+                  <option value="90">3 Months</option>
+                  <option value="365">1 Year</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex-1 flex items-center justify-center">
+              <canvas id="predictionGraph" class="w-full h-48"></canvas>
+            </div>
+            <div class="mt-2 text-xs text-gray-500">Scroll or select range to view predictions for next n days/months/years.</div>
           </div>
-          <svg id="sparkline" viewBox="0 0 300 60" class="w-full h-16">
-            <defs>
-              <linearGradient id="sparkGrad" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stop-color="#387ef5" stop-opacity="0.25" />
-                <stop offset="100%" stop-color="#387ef5" stop-opacity="0.05" />
-              </linearGradient>
-            </defs>
-            <path id="sparkPath" d="" stroke="#387ef5" stroke-width="2.5" fill="none" />
-            <path id="sparkFill" d="" fill="url(#sparkGrad)" />
-          </svg>
-        </div> -->
 
-        <!-- Search Bar for Stocks -->
-<div class="relative bg-white border border-gray-100 rounded-2xl p-5 mt-6 flex items-center gap-3">
-  <input id="stockSearchInput" type="text" class="border border-gray-200 rounded-lg px-4 py-2 w-full" placeholder="Search your stocks by symbol or name..." />
-  <button id="stockSearchBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Search</button>
-</div>
+          <!-- Stock Information Cards -->
+          <div class="col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
+            <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+              <div class="text-sm text-gray-500">Amount Invested</div>
+              <div id="info-invested" class="text-xl font-semibold mt-1">50,000</div>
+            </div>
+            <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+              <div class="text-sm text-gray-500">Predicted Value</div>
+              <div id="info-predicted" class="text-xl font-semibold mt-1">52,500</div>
+            </div>
+            <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+              <div class="text-sm text-gray-500">Prediction Accuracy</div>
+              <div id="info-accuracy" class="text-xl font-semibold mt-1">95%</div>
+            </div>
+            <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
+              <div class="text-sm text-gray-500">Other Details</div>
+              <div id="info-other" class="text-xl font-semibold mt-1">All positions stable</div>
+            </div>
+          </div>
 
-<div class="grid grid-cols-1 md:grid-cols-5 gap-6 mt-6">
-
-  <div class="col-span-2 bg-white border border-gray-100 rounded-2xl p-5 flex flex-col">
-    <div class="flex items-center justify-between mb-2">
-      <div class="font-semibold">Stock Prediction Graph</div>
-      <div class="flex items-center gap-2">
-        <label for="predictionRange" class="text-xs text-gray-500">Range:</label>
-        <select id="predictionRange" class="border border-gray-200 rounded-lg px-2 py-1 text-xs">
-          <option value="7">7 Days</option>
-          <option value="30">1 Month</option>
-          <option value="90">3 Months</option>
-          <option value="365">1 Year</option>
-        </select>
-      </div>
-    </div>
-    <div class="flex-1 flex items-center justify-center">
-      <canvas id="predictionGraph" class="w-full h-48"></canvas>
-    </div>
-    <div class="mt-2 text-xs text-gray-500">Scroll or select range to view predictions for next n days/months/years.</div>
-  </div>
-
-  <div class="col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4">
-    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
-      <div class="text-sm text-gray-500">Amount Invested</div>
-      <div id="info-invested" class="text-xl font-semibold mt-1">50,000</div>
-    </div>
-    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
-      <div class="text-sm text-gray-500">Predicted Value</div>
-      <div id="info-predicted" class="text-xl font-semibold mt-1">52,500</div>
-    </div>
-    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
-      <div class="text-sm text-gray-500">Prediction Accuracy</div>
-      <div id="info-accuracy" class="text-xl font-semibold mt-1">95%</div>
-    </div>
-    <div class="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col justify-center">
-      <div class="text-sm text-gray-500">Other Details</div>
-      <div id="info-other" class="text-xl font-semibold mt-1">All positions stable</div>
-    </div>
-  </div>
-
-  <div id="search-actions" class="col-span-3 md:col-span-5 mt-4">
-      <button id="prepareAddStockBtn" class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg w-full card-hover">
-        Add This Stock to My Portfolio
-      </button>
-      <button id="saveStockBtn" class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg w-full card-hover">
-      Quick Save
-    </button>
-  </div>
-  
-</div>
+          <!-- Action Buttons (Hidden by default, shown after search) -->
+          <div id="search-actions" class="col-span-3 md:col-span-5 mt-4">
+            <button id="prepareAddStockBtn" class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg w-full card-hover">
+              Add This Stock to My Portfolio
+            </button>
+            <button id="saveStockBtn" class="bg-brand-blue text-white font-medium px-6 py-3 rounded-lg w-full card-hover">
+              Quick Save
+            </button>
+          </div>
+        </div>
       </section>
 
-
-      <!-- My Stocks -->
-  <section id="section-mystocks" class="hidden">
+      <!-- =========================== MY STOCKS SECTION =========================== -->
+      <section id="section-mystocks" class="hidden">
+        <!-- Section Header -->
         <div class="flex items-center justify-between">
           <h2 class="text-xl md:text-2xl font-bold">My Stocks</h2>
           <div class="flex items-center gap-2">
@@ -223,6 +217,7 @@
           </div>
         </div>
 
+        <!-- Stocks Table -->
         <div class="mt-4 overflow-x-auto bg-white border border-gray-100 rounded-2xl">
           <table class="min-w-full text-sm">
             <thead class="bg-brand-light text-gray-600">
@@ -239,17 +234,17 @@
             <tbody id="stocksTbody" class="divide-y divide-gray-100"></tbody>
           </table>
         </div>
-        <div class="h-25"></div>
       </section>
 
-      
-
-      <!-- Transactions -->
-  <section id="section-transactions" class="hidden">
+      <!-- =========================== TRANSACTIONS SECTION =========================== -->
+      <section id="section-transactions" class="hidden">
+        <!-- Section Header -->
         <div class="flex items-center justify-between">
           <h2 class="text-xl md:text-2xl font-bold">Transactions</h2>
           <div class="text-sm text-gray-500">Auto-generated from your buys/sells</div>
         </div>
+        
+        <!-- Transactions Table -->
         <div class="mt-4 overflow-x-auto bg-white border border-gray-100 rounded-2xl">
           <table class="min-w-full text-sm">
             <thead class="bg-brand-light text-gray-600">
@@ -265,13 +260,13 @@
             <tbody id="txTbody" class="divide-y divide-gray-100"></tbody>
           </table>
         </div>
-        <div class="h-50"></div>
       </section>
 
-      <!-- Settings -->
-  <section id="section-settings" class="hidden">
+      <!-- =========================== SETTINGS SECTION =========================== -->
+      <section id="section-settings" class="hidden">
         <h2 class="text-xl md:text-2xl font-bold mb-4">Settings</h2>
         <div class="grid md:grid-cols-2 gap-4">
+          <!-- Currency Settings -->
           <div class="bg-white border border-gray-100 rounded-2xl p-5">
             <div class="font-semibold mb-3">Currency</div>
             <p class="text-sm text-gray-600 mb-2">Choose the display currency for your portfolio.</p>
@@ -282,27 +277,23 @@
               <option value="GBP">GBP £</option>
             </select>
           </div>
-          <!-- <div class="bg-white border border-gray-100 rounded-2xl p-5">
-            <div class="font-semibold mb-3">Theme</div>
-            <p class="text-sm text-gray-600 mb-2">Light/Dark theme preference.</p>
-            <button id="themeToggle2" class="px-4 py-2 border rounded-lg">Toggle Theme</button>
-          </div> -->
         </div>
-        <div class="h-25"></div>
       </section>
     </main>
   </div>
   
-
-  <!-- Add/Edit Stock Modal -->
-  <!--Stock Details to be fetched from Yahoo Finance API-->
-   <div id="stockModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center z-[60]">
+  <!-- =========================== ADD/EDIT STOCK MODAL =========================== -->
+  <div id="stockModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden flex items-center justify-center z-[60]">
     <div class="bg-white w-full max-w-lg rounded-2xl p-6 border border-gray-100 shadow-xl">
+      <!-- Modal Header -->
       <div class="flex items-center justify-between mb-4">
         <h3 id="modalTitle" class="text-lg font-semibold">Add Stock</h3>
         <button id="closeModal" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center">✕</button>
       </div>
+      
+      <!-- Stock Form -->
       <form id="stockForm" class="grid grid-cols-2 gap-4">
+        <!-- Input Fields Row 1 -->
         <div class="col-span-1">
           <label class="text-sm text-gray-600">Stock Symbol</label>
           <input id="fSymbol" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="AAPL" />
@@ -311,10 +302,14 @@
           <label class="text-sm text-gray-600">Company Name</label>
           <input id="fCompanyInput" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="Apple Inc." />
         </div>
+        
+        <!-- Fetch Details Button -->
         <div class="col-span-2 flex items-center gap-2">
           <button type="button" id="lookupBtn" class="bg-white text-black px-6 py-2 rounded-lg transition-colors font-medium border hover:bg-[#b2e0d4]">Fetch Details</button>
           <span id="lookupStatus" class="text-sm text-success"></span>
         </div>
+        
+        <!-- Auto-filled Information -->
         <div class="col-span-1">
           <label class="text-sm text-gray-600">Company Name</label>
           <input id="fCompany" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 bg-brand-light text-gray-500" readonly />
@@ -331,6 +326,8 @@
           <label class="text-sm text-gray-600">Sector</label>
           <input id="fSector" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 bg-brand-light text-gray-500" readonly />
         </div>
+        
+        <!-- User Input Fields -->
         <div class="col-span-1">
           <label class="text-sm text-gray-600">Quantity</label>
           <input id="fQty" type="number" min="1" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" placeholder="10" required />
@@ -347,7 +344,11 @@
           <label class="text-sm text-gray-600">Date</label>
           <input id="fDate" type="date" class="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2" required />
         </div>
+        
+        <!-- Hidden Fields -->
         <input type="hidden" id="editingIndex" value="" />
+        
+        <!-- Modal Actions -->
         <div class="col-span-2 flex items-center justify-end gap-3 mt-2">
           <button type="button" id="resetModal" class="px-4 py-2 border rounded-lg">Reset</button>
           <button type="button" id="cancelModal" class="px-4 py-2 border rounded-lg">Cancel</button>
@@ -356,9 +357,11 @@
       </form>
     </div>
   </div>
-  <!--Push footer down-->
-    <div class="h-40"></div>
+  
+  <!-- Spacer for footer -->
+  <div class="h-40"></div>
 
+  <!-- =========================== FOOTER =========================== -->
   <footer class="mt-10 border-t border-gray-100 py-8 bg-brand-light">
     <div class="max-w-7xl mx-auto px-4 text-sm text-gray-600 flex flex-wrap items-center justify-between gap-4">
       <div>© <span id="year"></span> Predictr — Dashboard</div>
@@ -371,57 +374,60 @@
   </footer>
 
 <script>
-  // ===== Live currency rates (will be updated from API) =====
+  // =========================== GLOBAL VARIABLES AND CONFIGURATION ===========================
+  
+  // Live currency exchange rates (updated from API)
   let FX = { USD: 1, EUR: 0.92, GBP: 0.78, INR: 84 }; // Default fallback rates
   const DEFAULT_CCY = localStorage.getItem('predictr_ccy') || 'INR';
 
-  // ===== State =====
+  // Application state management
   let state = JSON.parse(localStorage.getItem('predictr_state')||'null') || {
     currency: DEFAULT_CCY,
     stocks: [],
     transactions: []
   };
 
-  // ===== Utilities =====
+  // Global variable to store form data between handlers
+  let formDataForServer = null;
+
+  // =========================== UTILITY FUNCTIONS ===========================
+  
+  // DOM helper functions
   const el = sel => document.querySelector(sel);
   const els = sel => Array.from(document.querySelectorAll(sel));
+  // Currency formatting function
   const fmt = (v) => {
     const cur = state.currency;
     const usd = v;
     const fxRate = FX[cur] || 1;
     const converted = usd * fxRate;
     const symbol = cur==='USD'?'$':cur==='EUR'?'€':cur==='GBP'?'£':'₹';
-    // Using live exchange rates for conversion
     return symbol + converted.toLocaleString(undefined,{maximumFractionDigits:2});
   };
   
-  // Format value in specific currency (for individual stocks)
-  const fmtCurrency = (v, currency) => {
-    const symbol = currency==='USD'?'$':currency==='EUR'?'€':currency==='GBP'?'£':'₹';
-    return symbol + v.toLocaleString(undefined,{maximumFractionDigits:2});
-  };
-  
-  // Convert amount from one currency to another using live exchange rates
+  // Currency conversion between different currencies
   const convertCurrency = (amount, fromCurrency, toCurrency) => {
     if (fromCurrency === toCurrency) return amount;
     
     const fromRate = FX[fromCurrency] || 1;
     const toRate = FX[toCurrency] || 1;
     
-    // Convert from source currency to USD first
+    // Convert from source currency to USD first, then to target currency
     const amountInUSD = amount / fromRate;
-    
-    // Convert from USD to target currency
     const amountInTarget = amountInUSD * toRate;
     
     return amountInTarget;
   };
+  
+  // Save application state to localStorage
   const save = () => {
     localStorage.setItem('predictr_state', JSON.stringify(state));
     localStorage.setItem('predictr_ccy', state.currency);
   };
 
-  // ===== Derived metrics =====
+  // =========================== PORTFOLIO CALCULATION FUNCTIONS ===========================
+  
+  // Calculate portfolio totals and metrics
   function totals() {
   // Always calculate KPIs in user's default currency (INR) for consistency
   let invested = 0, current = 0;
@@ -474,15 +480,14 @@
   return { invested, current, pl, plp };
 }
 
-  // ===== Refresh All Currency-Dependent Displays =====
+  // Refresh all currency-dependent displays when exchange rates update
   function refreshAllCurrencyDisplays() {
     console.log('🔄 Refreshing all currency displays with updated rates');
     renderKPIs();
     renderStocks();
-    // Update any other currency-dependent UI elements here
   }
 
-  // ===== Rendering =====
+  // =========================== UI RENDERING FUNCTIONS ===========================
   function renderKPIs(){
     const t = totals();
     const currencySymbol = state.currency==='USD'?'$':state.currency==='EUR'?'€':state.currency==='GBP'?'£':'₹';
@@ -537,6 +542,7 @@
 }
 
 
+  // Render sparkline chart (currently unused but kept for future implementation)
   function renderSparkline(){
     const sparkPath = el('#sparkPath');
     const sparkFill = el('#sparkFill');
@@ -580,8 +586,8 @@
         <td class="p-3 text-right">${fmt(curUSD)}</td>
         <td class="p-3 text-right ${plUSD>=0?'text-success':'text-danger'}">${plUSD>=0?'+':''}${fmt(Math.abs(plUSD))}</td>
         <td class="p-3 text-right">
-          <button data-edit="${idx}" class="px-3 py-1.5 text-xs rounded-lg border mr-2 hover:bg-gray-50">Edit</button>
-          <button data-del="${idx}" class="px-3 py-1.5 text-xs rounded-lg border hover:bg-gray-50">Delete</button>
+          <button data-edit="${idx}" class="px-3 py-1.5 text-xs rounded-lg border border-gray-300 mr-2 hover:bg-gray-50 hover:border-gray-400 transition-colors">Edit</button>
+          <button data-del="${idx}" class="px-3 py-1.5 text-xs rounded-lg border border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 transition-colors">Delete</button>
         </td>`;
       tbody.appendChild(tr);
     });
@@ -612,7 +618,9 @@
     save();
   }
 
-  // ===== Navigation =====
+  // =========================== NAVIGATION FUNCTIONS ===========================
+  
+  // Show/hide sections based on navigation selection
   function showSection(id){
     ['overview','mystocks','transactions','settings'].forEach(key=>{
       const sec = el('#section-'+key);
@@ -632,7 +640,7 @@
   }
   els('.nav-item').forEach(a=> a.addEventListener('click', ()=> showSection(a.dataset.nav)));
 
-  // ===== Modal =====
+  // =========================== MODAL MANAGEMENT FUNCTIONS ===========================
   const openModal = () => { el('#stockModal').classList.remove('hidden'); };
   const closeModal = () => { el('#stockModal').classList.add('hidden'); el('#stockForm').reset(); el('#editingIndex').value=''; el('#modalTitle').textContent='Add Stock'; };
   el('#resetModal').addEventListener('click', ()=> {
@@ -671,9 +679,25 @@
       const idx = +del.dataset.del;
       const s = state.stocks[idx];
       
-      if (confirm(`Are you sure you want to delete ${s.symbol} (${s.company})?`)) {
-        console.log('🗑️ Deleting stock:', s.symbol);
+      // Enhanced confirmation dialog with more details
+      const confirmMessage = `⚠️ DELETE STOCK CONFIRMATION ⚠️
+
+Are you sure you want to permanently delete this stock from your portfolio?
+
+Stock: ${s.symbol} (${s.company})
+Quantity: ${s.qty} shares
+Buy Price: ${fmt(s.buy / (FX[s.currency] || 1))}
+Current Value: ${fmt((s.current / (FX[s.currency] || 1)) * s.qty)}
+
+⚠️ This action cannot be undone!
+
+Click OK to delete or Cancel to keep the stock.`;
+      
+      if (confirm(confirmMessage)) {
+        console.log('🗑️ User confirmed deletion of stock:', s.symbol);
         deleteStockFromServer(s.symbol, idx);
+      } else {
+        console.log('ℹ️ User cancelled deletion of stock:', s.symbol);
       }
     }
   });
@@ -756,9 +780,8 @@
     showSection('mystocks');
   });
 
-  // Global variable to store form data between handlers
-  let formDataForServer = null;
-
+  // =========================== STOCK PERSISTENCE FUNCTIONS ===========================
+  
   // Send saved stock to backend so it persists in MongoDB
   el('#stockForm').addEventListener('submit', async (e) => {
     // This second listener runs after the first (above) to persist the record.
@@ -994,7 +1017,9 @@
     }
   });
 
-  // ===== Debug Function =====
+  // =========================== DEBUG AND UTILITY FUNCTIONS ===========================
+  
+  // Debug function for form elements (development use only)
   function debugFormElements() {
     console.log('🔧 Form Elements Debug:');
     const elements = ['#fSymbol', '#fCompany', '#fQty', '#fBuy', '#fCurrent', '#fDate'];
@@ -1004,63 +1029,36 @@
     });
   }
 
-  // Make debug functions globally available
-  window.debugFormElements = debugFormElements;
+  // =========================== APPLICATION INITIALIZATION ===========================
   
-  // Add a manual form inspector
-  window.inspectForm = function() {
-    console.log('🔍 Manual Form Inspection:');
-    console.log('Symbol input element:', document.getElementById('fSymbol'));
-    console.log('Symbol input value:', document.getElementById('fSymbol')?.value);
-    console.log('Symbol input innerHTML:', document.getElementById('fSymbol')?.outerHTML);
-    console.log('All form inputs:');
-    const form = document.getElementById('stockForm');
-    const inputs = form?.querySelectorAll('input');
-    inputs?.forEach((input, index) => {
-      console.log(`  Input ${index}: id="${input.id}", value="${input.value}", placeholder="${input.placeholder}"`);
-    });
-  };
-
-  // ===== Init =====
+  // Initialize the dashboard application
   (function init(){
+    // Set current year in footer
     document.getElementById('year').textContent = new Date().getFullYear();
-    // setTheme(state.theme);
+    
+    // Show default section and render all components
     showSection('overview');
     renderAll();
     
-    // Debug info on page load
     console.log('🚀 Dashboard initialized');
     console.log('👤 User ID from data attribute:', document.body.dataset.userid);
     
-    // Add a delay to ensure DOM is fully loaded, then debug form elements
+    // Set up form event listeners after DOM is loaded
     setTimeout(() => {
-      debugFormElements();
-      
-      // Add event listeners to track form field changes
       const symbolInput = el('#fSymbol');
       if (symbolInput) {
-        symbolInput.addEventListener('input', (e) => {
-          console.log('📝 Symbol field changed to: "' + e.target.value + '"');
-        });
         symbolInput.addEventListener('blur', (e) => {
-          console.log('👁️ Symbol field lost focus, value: "' + e.target.value + '"');
           const symbol = e.target.value.trim().toUpperCase();
           if (symbol && symbol.length >= 2) {
             fetchCurrentPrice(symbol);
           }
         });
       }
-      
-      // Track form reset events
-      const form = el('#stockForm');
-      if (form) {
-        form.addEventListener('reset', () => {
-          console.log('🔄 Form was reset');
-        });
-      }
     }, 1000);
   })();
-   // Safe helper name (replaces el)
+  // =========================== STOCK SEARCH FUNCTIONALITY ===========================
+  
+  // Alternative querySelector helper
   const qs = (selector) => document.querySelector(selector);
 
   // Find the search bar element
@@ -1208,7 +1206,9 @@ suggestionBox.addEventListener('click', (e) => {
     });
   }
 
-  // ===== Auto-fetch Current Price =====
+  // =========================== STOCK DATA FUNCTIONS ===========================
+  
+  // Automatically fetch current stock price
   async function fetchCurrentPrice(symbol) {
     const currentPriceInput = el('#fCurrent');
     if (!currentPriceInput) return;
@@ -1263,7 +1263,7 @@ suggestionBox.addEventListener('click', (e) => {
     }
   }
 
-  // ===== Delete Stock from Server =====
+  // Delete stock from server and update local state
   async function deleteStockFromServer(symbol, localIndex) {
     try {
       const userId = document.body.dataset.userid || document.body.getAttribute('data-userid');
@@ -1304,18 +1304,20 @@ suggestionBox.addEventListener('click', (e) => {
         state.stocks.splice(localIndex, 1);
         
         renderAll();
-        alert(`✅ ${symbol} deleted successfully!`);
+        alert(`✅ SUCCESS: ${symbol} has been permanently deleted from your portfolio!`);
       } else {
         console.error('❌ Failed to delete from server:', data);
-        alert(`❌ Error deleting ${symbol}: ${data.error || 'Unknown error'}`);
+        alert(`❌ DELETION FAILED: Could not delete ${symbol} from your portfolio.\n\nError: ${data.error || 'Unknown server error'}\n\nPlease try again or contact support if the issue persists.`);
       }
     } catch (error) {
       console.error('💥 Error deleting stock:', error);
-      alert(`❌ Error deleting ${symbol}: ${error.message}`);
+      alert(`❌ CONNECTION ERROR: Could not delete ${symbol} from your portfolio.\n\nError: ${error.message}\n\nPlease check your internet connection and try again.`);
     }
   }
 
-  // ===== Fetch Live Exchange Rates =====
+  // =========================== EXCHANGE RATE FUNCTIONS ===========================
+  
+  // Fetch live exchange rates from API
   async function fetchExchangeRates() {
     try {
       console.log('💱 Fetching live exchange rates...');
@@ -1389,8 +1391,8 @@ suggestionBox.addEventListener('click', (e) => {
     }
   }
 
-  // ===== Fetch and Display My Stocks =====
-async function loadMyStocks() {
+  // Load user's stocks from server and update UI
+  async function loadMyStocks() {
   // Get user_id from multiple sources
   const userId = document.body.dataset.userid || document.body.getAttribute('data-userid');
   
@@ -1445,17 +1447,19 @@ async function loadMyStocks() {
   }
 }
 
-// Load saved stocks when page opens
-document.addEventListener("DOMContentLoaded", () => {
-  loadMyStocks();
-  fetchExchangeRates();
+  // =========================== PAGE INITIALIZATION ===========================
   
-  // Refresh exchange rates every 30 minutes
-  setInterval(fetchExchangeRates, 30 * 60 * 1000);
-});
+  // Load data when page opens
+  document.addEventListener("DOMContentLoaded", () => {
+    loadMyStocks();
+    fetchExchangeRates();
+    
+    // Refresh exchange rates every 30 minutes
+    setInterval(fetchExchangeRates, 30 * 60 * 1000);
+  });
 
-  // ===== Save Stock to MongoDB =====
-const saveBtn = document.getElementById("saveStockBtn");
+  // Save stock to database (Quick Save functionality)
+  const saveBtn = document.getElementById("saveStockBtn");
 if (saveBtn) {
   saveBtn.addEventListener("click", async () => {
     const symbol = document.getElementById("stockSearchInput").value.trim();
@@ -1503,8 +1507,8 @@ if (saveBtn) {
     }
   });
 }
-// ===== Remove a Stock =====
-async function removeStock(symbol) {
+  // Remove a stock from user's portfolio
+  async function removeStock(symbol) {
   if (!confirm(`Are you sure you want to remove ${symbol}?`)) {
     return;
   }
@@ -1534,6 +1538,766 @@ async function removeStock(symbol) {
     alert("Could not connect to the server.");
   }
 }
+
+  // =========================== AI CHATBOT FUNCTIONALITY ===========================
+  
+  // Chatbot state management
+  let isChatbotOpen = false;
+
+function toggleChatbot() {
+  const chatbot = document.getElementById('chatbot-container');
+  const chatbotIcon = document.getElementById('chatbot-icon');
+  const chatbotClose = document.getElementById('chatbot-close');
+  
+  console.log('Toggle chatbot called');
+  console.log('Chatbot element:', chatbot);
+  console.log('Current state:', isChatbotOpen);
+  
+  if (!chatbot) {
+    console.error('Chatbot container not found!');
+    return;
+  }
+  
+  isChatbotOpen = !isChatbotOpen;
+  
+  if (isChatbotOpen) {
+    // Show chatbot with simple display block
+    chatbot.style.display = 'block';
+    chatbot.style.transform = 'scale(1)';
+    chatbot.style.opacity = '1';
+    chatbot.style.visibility = 'visible';
+    chatbot.style.pointerEvents = 'auto';
+    
+    // Switch icons
+    if (chatbotIcon) chatbotIcon.style.display = 'none';
+    if (chatbotClose) chatbotClose.style.display = 'block';
+    
+    console.log('Chatbot opened - should be visible now');
+    
+    // Focus on input after a short delay
+    setTimeout(() => {
+      const input = document.getElementById('chat-input');
+      if (input) {
+        input.focus();
+        console.log('Input focused');
+      } else {
+        console.error('Chat input not found after opening!');
+      }
+    }, 100);
+    
+  } else {
+    // Hide chatbot
+    chatbot.style.transform = 'scale(0)';
+    chatbot.style.opacity = '0';
+    chatbot.style.pointerEvents = 'none';
+    
+    setTimeout(() => {
+      if (!isChatbotOpen) {
+        chatbot.style.visibility = 'hidden';
+        chatbot.style.display = 'none';
+      }
+    }, 300);
+    
+    // Switch icons
+    if (chatbotIcon) chatbotIcon.style.display = 'block';
+    if (chatbotClose) chatbotClose.style.display = 'none';
+    
+    console.log('Chatbot closed');
+  }
+}
+
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  
+  if (!input) {
+    console.error('Chat input not found');
+    return;
+  }
+  
+  const message = input.value.trim();
+  console.log('Sending message:', message);
+  
+  if (!message) {
+    console.log('Empty message, not sending');
+    return;
+  }
+  
+  // Add user message to chat
+  addMessageToChat(message, 'user');
+  input.value = '';
+  
+  // Show typing indicator
+  showTypingIndicator();
+  
+  // Add timeout message after 15 seconds
+  const timeoutMessage = setTimeout(() => {
+    const typingIndicator = document.getElementById('typing-indicator');
+    if (typingIndicator) {
+      const statusSpan = typingIndicator.querySelector('.text-xs');
+      if (statusSpan) {
+        statusSpan.textContent = 'AI is processing complex analysis, please wait...';
+        statusSpan.classList.add('animate-pulse');
+      }
+    }
+  }, 15000);
+  
+  // Send message to Gemini AI API
+  fetch('/api/ai/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      message: message,
+      currency: state.currency || 'INR'
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    clearTimeout(timeoutMessage);
+    hideTypingIndicator();
+    
+    if (data.success) {
+      // Add AI response to chat
+      addMessageToChat(data.response, 'bot');
+    } else {
+      // Fallback response in case of API error
+      const fallbackResponse = "I apologize, but I'm having trouble processing your request right now. Please try again in a moment, or feel free to ask about portfolio analysis, market trends, or investment strategies.";
+      addMessageToChat(fallbackResponse, 'bot');
+      console.error('AI API Error:', data.error);
+    }
+  })
+  .catch(error => {
+    clearTimeout(timeoutMessage);
+    hideTypingIndicator();
+    console.error('Error calling AI API:', error);
+    
+    // Fallback to professional responses if API fails
+    const professionalResponses = [
+      "📊 I can analyze your portfolio performance and provide optimization insights. What would you like to focus on?",
+      "📈 I specialize in market analysis and technical indicators. What specific area interests you?",
+      "🎯 I help with portfolio rebalancing and growth opportunities. What's your investment timeframe?",
+      "📋 I provide analytics including risk assessment and volatility analysis for your holdings.",
+      "🔍 I offer market intelligence including earnings forecasts and trend analysis.",
+      "⚡ I can perform stock screening and generate recommendations based on your risk profile.",
+      "🏆 My expertise covers trading strategies and investment analysis. How can I help?",
+      "📈 I analyze fundamentals, compare stocks, and track market sentiment. What interests you?"
+    ];
+    
+    // Add some context-aware responses based on message content
+    const userMessage = message.toLowerCase();
+    let response;
+    
+    if (userMessage.includes('portfolio') || userMessage.includes('stocks')) {
+      response = "📊 I can help evaluate your portfolio performance, risk metrics, and suggest optimization strategies. What would you like to analyze?";
+    } else if (userMessage.includes('price') || userMessage.includes('market')) {
+      response = "📈 I provide market analysis, price trends, and technical indicators to support your trading decisions.";
+    } else if (userMessage.includes('help') || userMessage.includes('what')) {
+      response = "🤖 I'm your AI trading assistant. I help with portfolio analysis, market research, risk assessment, and investment strategies.";
+    } else {
+      response = professionalResponses[Math.floor(Math.random() * professionalResponses.length)];
+    }
+    
+    addMessageToChat(response, 'bot');
+  });
+}
+
+function addMessageToChat(message, sender) {
+  const chatMessages = document.getElementById('chat-messages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`;
+  
+  const isUser = sender === 'user';
+  const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  
+  messageDiv.innerHTML = `
+    <div class="max-w-sm ${isUser ? 'ml-8' : 'mr-8'} ${!isUser ? 'ai-message-container' : ''}">
+      ${!isUser ? `
+        <div class="ai-message-header flex items-center space-x-2 mb-2" style="position: relative; top: 0; z-index: 10;">
+          <div class="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg" style="background-color: #10b981 !important;">
+            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" style="color: #ffffff !important;">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              <circle cx="9" cy="9" r="1"/>
+              <circle cx="15" cy="9" r="1"/>
+              <rect x="8" y="13" width="8" height="1" rx="0.5"/>
+            </svg>
+          </div>
+          <span class="text-sm font-bold text-slate-700" style="color: #374151 !important; font-weight: 700 !important;">AI Financial Advisor</span>
+        </div>
+      ` : ''}
+      
+      <div class="px-4 py-3 rounded-2xl shadow-sm ${
+        isUser 
+          ? 'bg-emerald-600 text-white ml-auto' 
+          : 'bg-white border border-slate-200 text-slate-800'
+      }" style="${isUser ? 'background-color: #059669 !important; color: #ffffff !important;' : 'background-color: #ffffff !important; color: #1e293b !important; border: 2px solid #e2e8f0 !important;'}">
+        <p class="text-sm leading-relaxed font-medium" style="${isUser ? 'color: #ffffff !important;' : 'color: #1e293b !important; font-weight: 500 !important;'}">${message}</p>
+        <div class="flex items-center justify-between mt-3">
+          <span class="text-xs font-semibold" style="${isUser ? 'color: #a7f3d0 !important;' : 'color: #64748b !important; font-weight: 600 !important;'}">${timestamp}</span>
+          ${!isUser ? `<div class="flex items-center space-x-1">
+            <div class="w-2 h-2 bg-emerald-500 rounded-full" style="background-color: #10b981 !important;"></div>
+            <span class="text-xs text-slate-600 font-semibold" style="color: #475569 !important; font-weight: 600 !important;">Online</span>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+  
+  chatMessages.appendChild(messageDiv);
+  
+  // Smart scroll behavior - scroll to top for first message, bottom for subsequent
+  setTimeout(() => {
+    const messageCount = chatMessages.children.length;
+    if (messageCount === 1) {
+      // First message - force to top with additional styling
+      chatMessages.scrollTop = 0;
+      
+      // Ensure first message starts from the very top
+      const firstMessage = chatMessages.querySelector('div:first-child');
+      if (firstMessage) {
+        firstMessage.style.marginTop = '0px';
+        firstMessage.style.paddingTop = '0px';
+        firstMessage.style.position = 'relative';
+        firstMessage.style.top = '0px';
+        
+        // Ensure AI header is visible at top
+        const aiHeader = firstMessage.querySelector('.ai-message-header');
+        if (aiHeader) {
+          aiHeader.style.marginTop = '0px';
+          aiHeader.style.paddingTop = '0px';
+          aiHeader.style.position = 'relative';
+          aiHeader.style.top = '0px';
+          aiHeader.style.visibility = 'visible';
+          aiHeader.style.display = 'flex';
+        }
+      }
+      
+      console.log('✅ First message positioned at absolute top');
+    } else {
+      // Subsequent messages - scroll to bottom
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  }, 100);
+}
+
+function showTypingIndicator() {
+  const chatMessages = document.getElementById('chat-messages');
+  const typingDiv = document.createElement('div');
+  typingDiv.id = 'typing-indicator';
+  typingDiv.className = 'flex justify-start mb-4';
+  typingDiv.innerHTML = `
+    <div class="max-w-sm mr-8">
+      <div class="flex items-center space-x-2 mb-2">
+        <div class="w-7 h-7 bg-emerald-500 rounded-xl flex items-center justify-center shadow-md">
+          <svg class="w-4 h-4 text-white animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+            <circle cx="9" cy="9" r="1"/>
+            <circle cx="15" cy="9" r="1"/>
+            <rect x="8" y="13" width="8" height="1" rx="0.5"/>
+          </svg>
+        </div>
+        <span class="text-xs font-semibold text-slate-600">AI is analyzing...</span>
+      </div>
+      
+      <div class="bg-white border border-slate-200 px-4 py-3 rounded-2xl shadow-sm">
+        <div class="flex items-center space-x-3">
+          <div class="flex space-x-1">
+            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
+            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+            <div class="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+          </div>
+          <span class="text-xs text-slate-600 font-medium">Processing your financial query...</span>
+        </div>
+      </div>
+    </div>
+  `;
+  chatMessages.appendChild(typingDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function hideTypingIndicator() {
+  const typingIndicator = document.getElementById('typing-indicator');
+  if (typingIndicator) {
+    typingIndicator.remove();
+  }
+}
+
+// Debug function to force open chatbot
+function forceOpenChatbot() {
+  const chatbot = document.getElementById('chatbot-container');
+  if (chatbot) {
+    chatbot.style.display = 'block';
+    chatbot.style.transform = 'scale(1)';
+    chatbot.style.opacity = '1';
+    chatbot.style.visibility = 'visible';
+    chatbot.style.pointerEvents = 'auto';
+    chatbot.style.zIndex = '9999';
+    isChatbotOpen = true;
+    
+    const input = document.getElementById('chat-input');
+    if (input) {
+      input.style.display = 'block';
+      input.style.visibility = 'visible';
+      input.focus();
+      console.log('Forced chatbot open and input focused');
+    }
+  }
+}
+
+// Initialize chatbot with welcome message
+document.addEventListener('DOMContentLoaded', function() {
+  // Debug: Check if elements exist
+  console.log('=== CHATBOT DEBUG INFO ===');
+  console.log('Chatbot container:', document.getElementById('chatbot-container'));
+  console.log('Chatbot icon:', document.getElementById('chatbot-icon'));
+  console.log('Chat input:', document.getElementById('chat-input'));
+  
+  // Add debug button temporarily
+  // const debugBtn = document.createElement('button');
+  // debugBtn.innerText = 'Force Open Chat (Debug)';
+  // debugBtn.style.position = 'fixed';
+  // debugBtn.style.top = '10px';
+  // debugBtn.style.right = '10px';
+  // debugBtn.style.zIndex = '10000';
+  // debugBtn.style.background = 'red';
+  // debugBtn.style.color = 'white';
+  // debugBtn.style.padding = '10px';
+  // debugBtn.onclick = forceOpenChatbot;
+  // document.body.appendChild(debugBtn);
+  
+  // Add welcome message when chatbot opens
+  const originalToggle = window.toggleChatbot;
+  window.toggleChatbot = function() {
+    originalToggle();
+    
+    // Add professional welcome message only when opening for the first time
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages && chatMessages.children.length === 0) {
+      setTimeout(() => {
+        addMessageToChat("Welcome! I'm your AI Financial Advisor. I provide data-driven insights for portfolio analysis, market trends, and investment strategies. Please note: This is for informational purposes only and not personalized financial advice. How may I assist with your financial analysis today?", 'bot');
+        
+        // Force scroll to top and ensure visibility
+        setTimeout(() => {
+          chatMessages.scrollTop = 0;
+          
+          // Ensure all elements are visible
+          const firstMessage = chatMessages.querySelector('div:first-child');
+          if (firstMessage) {
+            firstMessage.style.marginTop = '0px';
+            firstMessage.style.position = 'relative';
+            firstMessage.style.top = '0px';
+            firstMessage.style.visibility = 'visible';
+            firstMessage.style.display = 'flex';
+            
+            const aiHeader = firstMessage.querySelector('.ai-message-header');
+            if (aiHeader) {
+              aiHeader.style.display = 'flex';
+              aiHeader.style.visibility = 'visible';
+              aiHeader.style.position = 'relative';
+              aiHeader.style.top = '0px';
+              aiHeader.style.marginBottom = '8px';
+            }
+          }
+          
+          // Double-check scroll position
+          chatMessages.scrollTop = 0;
+          console.log('✅ Chatbot welcome message positioned at top and fully visible');
+        }, 300);
+      }, 200);
+    }
+  };
+});
+
+// Quick suggestion function
+function quickAsk(question) {
+  const input = document.getElementById('chat-input');
+  input.value = question;
+  sendMessage();
+}
+
+// Handle Enter key in chat input
+document.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter' && document.getElementById('chat-input') === document.activeElement) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// Force input styling and ensure proper chat visibility
+function forceInputStyling() {
+  const input = document.getElementById('chat-input');
+  if (input) {
+    input.style.backgroundColor = '#ffffff';
+    input.style.color = '#000000';
+    input.style.webkitTextFillColor = '#000000';
+    input.style.fontSize = '14px';
+    input.style.fontWeight = '500';
+    input.style.border = '2px solid #d1d5db';
+    console.log('✅ Input styling forced - should be black text on white background');
+  }
+}
+
+// Ensure chat messages are properly visible
+function ensureChatVisibility() {
+  const chatMessages = document.getElementById('chat-messages');
+  if (chatMessages) {
+    // Force container styling
+    chatMessages.style.paddingTop = '24px';
+    chatMessages.style.paddingBottom = '24px';
+    chatMessages.style.overflowY = 'auto';
+    
+    // Reset scroll position to show first message from top
+    chatMessages.scrollTop = 0;
+    
+    // Ensure first message has proper positioning
+    const firstMessage = chatMessages.querySelector('div:first-child');
+    if (firstMessage) {
+      firstMessage.style.marginTop = '0px';
+      firstMessage.style.paddingTop = '0px';
+      firstMessage.style.position = 'relative';
+      firstMessage.style.top = '0px';
+      
+      // Ensure AI header is visible
+      const aiHeader = firstMessage.querySelector('.ai-message-header');
+      if (aiHeader) {
+        aiHeader.style.position = 'relative';
+        aiHeader.style.top = '0px';
+        aiHeader.style.zIndex = '10';
+        aiHeader.style.marginBottom = '8px';
+        aiHeader.style.visibility = 'visible';
+        aiHeader.style.display = 'flex';
+      }
+    }
+    
+    console.log('✅ Chat visibility ensured - AI header and messages should be fully visible');
+  }
+}
+
+// Apply styling when document loads
+document.addEventListener('DOMContentLoaded', forceInputStyling);
+
+// Also apply when chatbot opens
+const originalToggle = window.toggleChatbot;
+if (originalToggle) {
+  window.toggleChatbot = function() {
+    originalToggle();
+    setTimeout(() => {
+      forceInputStyling();
+      ensureChatVisibility();
+    }, 100);
+  };
+}
 </script>
+
+  <!-- =========================== AI CHATBOT COMPONENT =========================== -->
+  <div class="fixed bottom-6 right-6 z-50">
+    <!-- AI Chat Assistant Container -->
+    <div id="chatbot-container" class="fixed bottom-20 right-4 w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 transform transition-all duration-300 ease-out origin-bottom-right overflow-hidden z-50 flex flex-col" style="display: none; transform: scale(0); opacity: 0; visibility: hidden; pointer-events: none; height: 620px; max-height: 620px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+      
+      <!-- Chatbot Header -->
+      <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-5 py-4 flex items-center justify-between flex-shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              <circle cx="9" cy="9" r="1"/>
+              <circle cx="15" cy="9" r="1"/>
+              <path d="M9 15h6"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-white font-bold text-base">AI Financial Advisor</h3>
+            <div class="flex items-center space-x-2">
+              <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+              <p class="text-slate-300 text-xs font-medium">Online & Ready</p>
+            </div>
+          </div>
+        </div>
+        <button onclick="toggleChatbot()" class="p-2 hover:bg-white/10 rounded-xl transition-colors group">
+          <svg class="w-5 h-5 text-slate-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Investment Disclaimer -->
+      <div class="bg-amber-50 border-b border-amber-200 px-5 py-2 flex-shrink-0" style="position: relative; z-index: 20; display: block !important; visibility: visible !important;">
+        <div class="flex items-start space-x-2">
+          <svg class="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z"/>
+          </svg>
+          <div class="text-xs">
+            <p class="font-semibold text-amber-800" style="color: #92400e !important; font-weight: 600 !important;">Investment Disclaimer</p>
+            <p class="text-amber-700 leading-tight" style="color: #b45309 !important;">AI provides information only. Not financial advice. Consult professionals before investing.</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Chat Messages Container -->
+      <div id="chat-messages" class="flex-1 overflow-y-auto px-4 bg-slate-50" style="min-height: 260px; max-height: 260px; scroll-behavior: smooth; padding-top: 16px; padding-bottom: 16px; position: relative; z-index: 10;">
+        <!-- AI conversation messages will be dynamically added here -->
+      </div>
+      
+      <!-- Quick Action Buttons -->
+      <div class="flex-shrink-0 px-4 py-2 bg-white border-t border-slate-200" style="position: relative; z-index: 15;">
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="quickAsk('Analyze my portfolio performance')" class="px-3 py-1.5 bg-slate-100 hover:bg-emerald-500 hover:text-white rounded-full text-xs font-medium transition-all duration-200 border border-slate-200 hover:border-emerald-500">
+            📊 Portfolio Analysis
+          </button>
+          <button onclick="quickAsk('Current market trends')" class="px-3 py-1.5 bg-slate-100 hover:bg-blue-500 hover:text-white rounded-full text-xs font-medium transition-all duration-200 border border-slate-200 hover:border-blue-500">
+            📈 Market Trends
+          </button>
+          <button onclick="quickAsk('Risk assessment help')" class="px-3 py-1.5 bg-slate-100 hover:bg-orange-500 hover:text-white rounded-full text-xs font-medium transition-all duration-200 border border-slate-200 hover:border-orange-500">
+            ⚖️ Risk Analysis
+          </button>
+        </div>
+      </div>
+      
+      <!-- Chat Input Section -->
+      <div class="flex-shrink-0 p-4 bg-white border-t border-slate-200" style="position: relative; z-index: 15; background-color: #ffffff !important;">
+        <div class="flex space-x-3">
+          <div class="flex-1 relative">
+            <input 
+              id="chat-input" 
+              type="text" 
+              placeholder="Type your financial question here..."
+              class="w-full px-4 py-3 border-2 border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200"
+              style="background-color: #ffffff !important; color: #1e293b !important; font-size: 14px !important; font-weight: 500 !important; border-color: #cbd5e1 !important; visibility: visible !important; display: block !important;"
+            />
+            <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+          <button 
+            onclick="sendMessage()"
+            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-xl transition-all duration-200 flex-shrink-0 shadow-lg hover:shadow-xl transform hover:scale-105 group"
+            style="visibility: visible !important; display: flex !important; align-items: center !important; justify-content: center !important;"
+          >
+            <svg class="w-5 h-5 group-hover:translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Chatbot Footer -->
+        <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-100" style="visibility: visible !important; display: flex !important;">
+          <div class="flex items-center space-x-2 text-xs text-slate-500" style="visibility: visible !important;">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            <span class="font-medium">Secure</span>
+          </div>
+          <div class="text-xs text-slate-500" style="visibility: visible !important; color: #64748b !important;">
+            <span class="font-semibold" style="color: #64748b !important;">Powered by</span> <span class="text-emerald-600 font-bold" style="color: #059669 !important;">Google Gemini</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  <!-- Modern AI Floating Button -->
+  <button 
+    onclick="toggleChatbot()" 
+    class="fixed bottom-8 right-4 z-40 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-xl transition-all duration-300 group transform hover:scale-105 relative"
+    style="box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);"
+  >
+    <!-- Simple solid background -->
+    <div class="absolute inset-0 rounded-full bg-blue-600"></div>
+    
+    <!-- Main content -->
+    <div class="relative z-10">
+      <!-- Robot Assistant Icon -->
+      <svg id="chatbot-icon" class="w-6 h-6 transition-all duration-300 group-hover:rotate-12" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+        <circle cx="9" cy="9" r="1" fill="white"/>
+        <circle cx="15" cy="9" r="1" fill="white"/>
+        <rect x="8" y="13" width="8" height="2" rx="1" fill="white"/>
+      </svg>
+      
+      <!-- Close Icon -->
+      <svg id="chatbot-close" class="w-6 h-6 hidden transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </div>
+    
+    <!-- AI Activity Indicator -->
+    <div class="absolute -top-1 -right-1 flex">
+      <div class="w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-ping"></div>
+      <div class="w-3 h-3 bg-green-500 rounded-full border-2 border-white absolute"></div>
+    </div>
+    
+    <!-- Floating sparkles -->
+    <div class="absolute -top-2 -left-2 w-1 h-1 bg-white rounded-full animate-ping opacity-70" style="animation-delay: 0.5s;"></div>
+    <div class="absolute -bottom-2 -right-2 w-1 h-1 bg-white rounded-full animate-ping opacity-70" style="animation-delay: 1s;"></div>
+    <div class="absolute top-0 -right-3 w-0.5 h-0.5 bg-blue-200 rounded-full animate-ping opacity-50" style="animation-delay: 1.5s;"></div>
+  </button>
+</div>
+
+<!-- AI Chatbot Styles -->
+<style>
+  /* Chatbot Container */
+  #chatbot-container {
+    z-index: 9999 !important;
+    position: fixed !important;
+  }
+  
+  /* Chat Input Styling - High Specificity */
+  div#chatbot-container #chat-input,
+  #chatbot-container input#chat-input,
+  input[id="chat-input"] {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #d1d5db !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+  
+  div#chatbot-container #chat-input:focus,
+  #chatbot-container input#chat-input:focus,
+  input[id="chat-input"]:focus {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #2563eb !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3) !important;
+    -webkit-text-fill-color: #000000 !important;
+  }
+  
+  div#chatbot-container #chat-input::placeholder,
+  #chatbot-container input#chat-input::placeholder,
+  input[id="chat-input"]::placeholder {
+    color: #6b7280 !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #6b7280 !important;
+  }
+  
+  /* Chat messages container - Ensure full visibility */
+  #chat-messages {
+    scroll-padding-top: 16px !important;
+    scroll-padding-bottom: 16px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+    position: relative !important;
+    z-index: 10 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 260px !important;
+    max-height: 260px !important;
+  }
+  
+  /* Ensure all messages are visible starting from the top */
+  #chat-messages > div:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    position: relative !important;
+    top: 0 !important;
+    display: flex !important;
+    visibility: visible !important;
+  }
+  
+  /* Ensure AI avatar and header are always visible at the top */
+  .ai-message-header {
+    position: relative !important;
+    top: 0 !important;
+    margin-bottom: 8px !important;
+    z-index: 15 !important;
+    display: flex !important;
+    visibility: visible !important;
+    align-items: center !important;
+    background-color: transparent !important;
+  }
+  
+  /* Ensure proper visibility for AI messages - start from top */
+  .ai-message-container {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    position: relative !important;
+    display: block !important;
+    visibility: visible !important;
+    z-index: 12 !important;
+  }
+  
+  /* Force disclaimer to stay at the top and be visible */
+  .bg-amber-50 {
+    position: relative !important;
+    z-index: 25 !important;
+    display: block !important;
+    visibility: visible !important;
+    margin: 0 !important;
+    padding: 12px 20px !important;
+    background-color: #fffbeb !important;
+    border-bottom: 1px solid #fbbf24 !important;
+  }
+  
+  /* Ensure disclaimer text is visible */
+  .bg-amber-50 p,
+  .bg-amber-50 span {
+    color: #92400e !important;
+    font-weight: 600 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+  
+  /* Ensure disclaimer icon is visible */
+  .bg-amber-50 svg {
+    color: #d97706 !important;
+    visibility: visible !important;
+  }
+  
+  /* Ensure the entire chatbot container layout is proper */
+  #chatbot-container {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 620px !important;
+    max-height: 620px !important;
+    overflow: hidden !important;
+  }
+  
+  /* Scrollbar for chat messages */
+  #chat-messages::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  #chat-messages::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  
+  #chat-messages::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+  
+  #chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+  
+  /* User message bubble styling */
+  .user-message-bubble {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+  }
+  
+  .user-message-bubble p {
+    color: #ffffff !important;
+  }
+  
+  .user-message-bubble span {
+    color: #dbeafe !important;
+  }
+  
+  /* Bot message bubble styling */
+  .bot-message-bubble {
+    background-color: #ffffff !important;
+    color: #1f2937 !important;
+    border: 1px solid #e5e7eb !important;
+  }
+  
+  .bot-message-bubble p {
+    color: #1f2937 !important;
+  }
+</style>
+
 </body>
 </html>
